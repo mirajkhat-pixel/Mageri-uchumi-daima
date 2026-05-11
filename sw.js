@@ -3,7 +3,7 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-const CACHE_NAME = 'mageri-v1';
+const CACHE_NAME = 'mageri-v3';
 const urlsToCache = [
   './',
   './index.html',
