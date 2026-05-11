@@ -1,3 +1,8 @@
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 const CACHE_NAME = 'mageri-v1';
 const urlsToCache = [
   './',

@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAGERI UCHUMI DAIMA</title>
+<head>
+    <meta charset="UTF-8">
+    <title>MAGERI Uchumi Daima</title>
+    
+    <!-- WEKA HIZI 5 HAPA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#f39c12">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- zilizopo zingine ziachi... -->
+</head>
 <!-- PWA Meta Tags -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#0d9488">
@@ -2394,5 +2407,28 @@ checkInstallPrompt();
         }
     }
 </script>
+  <!-- WEKA HII KABLA YA </body> -->
+  <script>
+    // PWA INSTALL + UPDATE BADGE
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        reg.addEventListener('updatefound', () => {
+          const newSW = reg.installing;
+          newSW.addEventListener('statechange', () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              if(confirm('MAGERI V3 Ipo! Bonyeza OK ku-update sasa.')) {
+                newSW.postMessage('SKIP_WAITING');
+                window.location.reload();
+              }
+            }
+          });
+        });
+      });
+    }
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  </script>
 </body>
 </html>
