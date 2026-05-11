@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAGERI UCHUMI DAIMA</title>
+<!-- PWA Meta Tags -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0d9488">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MAGERI">
+<link rel="apple-touch-icon" href="./icon-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Poppins', sans-serif; }
+        body { 
+            background: #011f26; 
+            color: #ffffff; 
+            transition: all 0.3s;
+        }
+        body.light-mode { 
+            background: #f0f9ff; 
+            color: #011f26; 
+        }
+        .glass { 
+            background: rgba(10, 77, 104, 0.2); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(5, 191, 219, 0.3); 
+        }
+        body.light-mode .glass { 
+            background: rgba(255, 255, 255, 0.9); 
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .glow { box-shadow: 0 0 20px rgba(5, 191, 219, 0.5); }
+        .live-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .toast { position: fixed; top: 20px; right: 20px; z-index: 9999; animation: slideIn 0.3s ease-out; }
+        .member-tab-content { display: none; }
+        .member-tab-content.active { display: block; }
+        .admin-tab { cursor: pointer; transition: all 0.3s; }
+        .admin-tab:hover { background: #088395; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .animate-pulse { animation: pulse 1.5s infinite; }
+    </style>
+</head>
+<body>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastContainer"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="glass sticky top-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img id="groupLogo" src="https://ui-avatars.com/api/?name=MAGERI&background=05bfdb&color=011f26&bold=true" class="w-12 h-12 rounded-full border-2 border-[#05bfdb]">
+                <div>
+                    <h1 id="groupName" class="text-xl font-bold text-[#05bfdb]">MAGERI UCHUMI DAIMA</h1>
+                    <p class="text-xs text-gray-400">Tunaokoleana Kiuchumi</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" id="themeBtn" class="bg-[#0a4d68] px-3 py-2 rounded-lg hover:bg-[#088395] transition">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div id="userStatusNav" class="text-sm"></div>
+                <button id="loginBtnNav" onclick="showLoginModal()" class="bg-[#088395] px-4 py-2 rounded-lg hover:bg-[#05bfdb] hover:text-[#011f26] transition">
+                    <i class="fas fa-sign-in-alt mr-1"></i>Ingia
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HOME PAGE -->
+    <div id="home" class="min-h-screen">
+        <div class="max-w-7xl mx-auto p-4 py-8">
+            <!-- HERO SECTION -->
+            <div class="glass p-8 rounded-2xl mb-8 text-center glow">
+                <h2 class="text-4xl font-bold mb-3 text-[#05bfdb]">Karibu MAGERI UCHUMI DAIMA</h2>
+                <p class="text-lg text-gray-300 mb-6">Jukwaa la kiuchumi linalookoa wanachama wake kwa mfumo wa mzunguko wa haki</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-[#011f26] p-4 rounded-xl">
+                        <i class="fas fa-users text-3xl text-[#05bfdb] mb-2"></i>
+                        <p class="text-2xl font-bold" id="totalMembers">0</p>
+                        <p class="text-xs text-gray-400">Wanachama</p>
+                    </div>
+                    <div class="bg-[#011f26] p-4 rounded-xl">
+                        <i class="fas fa-coins text-3xl text-[#088395] mb-2"></i>
+                        <p class="text-2xl font-bold" id="totalMichango">TZS 0</p>
+                        <p class="text-xs text-gray-400">Jumla Michango</p>
+                    </div>
+                    <div class="bg-[#011f26] p-4 rounded-xl">
+                        <i class="fas fa-sync text-3xl text-[#05bfdb] mb-2"></i>
+                        <p class="text-2xl font-bold" id="currentMzunguko">0</p>
+                        <p class="text-xs text-gray-400">Mzunguko</p>
+                    </div>
+                    <div class="bg-[#011f26] p-4 rounded-xl">
+                        <i class="fas fa-crown text-3xl text-[#088395] mb-2"></i>
+                        <p class="text-2xl font-bold" id="nextMpokeaji">-</p>
+                        <p class="text-xs text-gray-400">Anayepokea</p>
+                    </div>
+                </div>
+                <button onclick="showRegisterModal()" class="bg-gradient-to-r from-[#088395] to-[#05bfdb] px-8 py-3 rounded-full text-lg font-semibold hover:scale-105 transition">
+                    <i class="fas fa-user-plus mr-2"></i>Jiunge Nasi Sasa
+                </button>
+            </div>
+
+            <!-- LIVE MEETING SECTION -->
+            <div id="liveMeetingSection" class="glass p-6 rounded-2xl mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-video text-red-500 mr-2"></i>Mkutano wa Moja kwa Moja</h3>
+                    <span id="liveIndicator" class="hidden"><span class="w-3 h-3 bg-red-500 rounded-full inline-block live-pulse"></span> LIVE</span>
+                </div>
+                <div id="liveMeetingContainer"></div>
+            </div>
+
+            <!-- CALENDAR YA MIZUNGUKO -->
+            <div class="glass p-6 rounded-2xl mb-8">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-calendar-alt text-[#05bfdb] mr-2"></i>Kalenda ya Mizunguko</h3>
+                <div id="calendarMizunguko" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+            </div>
+
+            <!-- MATANGAZO -->
+            <div class="glass p-6 rounded-2xl mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-bullhorn text-[#05bfdb] mr-2"></i>Matangazo</h3>
+                    <button id="addTangazoBtn" onclick="showTangazoModal()" class="hidden bg-[#088395] px-4 py-2 rounded-lg">
+                        <i class="fas fa-plus mr-1"></i>Ongeza
+                    </button>
+                </div>
+                <div id="matangazoList" class="space-y-3"></div>
+            </div>
+
+            <!-- MUSIC SECTION - FIXED BUTTON -->
+            <div class="glass p-6 rounded-2xl mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-music text-[#05bfdb] mr-2"></i>Muziki wa Kikundi</h3>
+                    <button id="uploadMusicBtn" onclick="showUploadMusicModal()" class="bg-[#088395] px-4 py-2 rounded-lg hover:bg-[#05bfdb] hover:text-[#011f26] transition">
+                        <i class="fas fa-upload mr-1"></i>Pandisha Muziki
+                    </button>
+                </div>
+                <div id="musicList" class="space-y-3"></div>
+            </div>
+
+            <!-- WANACHAMA -->
+            <div class="glass p-6 rounded-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold"><i class="fas fa-users text-[#05bfdb] mr-2"></i>Wanachama Wetu</h3>
+                    <button onclick="showWanachamaFull()" class="bg-[#088395] px-4 py-2 rounded-lg">
+                        <i class="fas fa-eye mr-1"></i>Ona Wote
+                    </button>
+                </div>
+                <div id="wanachamaPublicList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEMBER DASHBOARD -->
+    <div id="memberDashboard" class="hidden min-h-screen"></div>
+
+    <!-- WANACHAMA FULL LIST -->
+    <div id="wanachamaFullPage" class="hidden min-h-screen">
+        <div class="max-w-7xl mx-auto p-4 py-8">
+            <button onclick="goHome()" class="mb-4 bg-[#088395] px-4 py-2 rounded-lg">
+                <i class="fas fa-arrow-left mr-1"></i>Rudi Nyumbani
+            </button>
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-2xl font-bold mb-6">Wanachama Wote</h2>
+                <input type="text" id="searchWanachamaPublic" placeholder="Tafuta mwanachama..." class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-4" onkeyup="searchWanachamaPublic()">
+                <div id="wanachamaPublicListFull" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </div>
+        </div>
+    </div>
+    <!-- MODALS -->
+    
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-md w-full slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Ingia</h3>
+                <button onclick="closeLoginModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="tel" id="loginSimu" placeholder="Namba ya Simu" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="password" id="loginPassword" placeholder="Neno la Siri" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-4">
+            <button onclick="login()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold hover:bg-[#05bfdb] hover:text-[#011f26] transition">
+                <i class="fas fa-sign-in-alt mr-2"></i>Ingia
+            </button>
+            <p class="text-center text-sm text-gray-400 mt-4">
+                Huna akaunti? <button onclick="closeLoginModal(); showRegisterModal()" class="text-[#05bfdb]">Jisajili</button>
+            </p>
+        </div>
+    </div>
+    
+    <!-- REGISTER MODAL -->
+    <div id="registerModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4 overflow-y-auto">
+        <div class="glass p-6 rounded-2xl max-w-md w-full my-8 slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Jisajili</h3>
+                <button onclick="closeRegisterModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="regJina" placeholder="Jina Kamili" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="tel" id="regSimu" placeholder="Namba ya Simu" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="date" id="regDob" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <select id="regJinsia" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                <option value="">Chagua Jinsia</option>
+                <option value="Mwanaume">Mwanaume</option>
+                <option value="Mwanamke">Mwanamke</option>
+            </select>
+            <input type="text" id="regMahali" placeholder="Mahali Unapoishi" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="password" id="regPassword" placeholder="Neno la Siri" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="password" id="regConfirmPassword" placeholder="Thibitisha Neno la Siri" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <div class="mb-3">
+                <label class="block text-sm mb-2">Picha Yako</label>
+                <input type="file" id="regPicha" accept="image/*" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3">
+                <img id="previewPicha" class="hidden w-24 h-24 rounded-full mt-2 mx-auto">
+            </div>
+            <button onclick="jisajiliMwanachama()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold hover:bg-[#05bfdb] hover:text-[#011f26] transition">
+                <i class="fas fa-user-plus mr-2"></i>Jisajili Sasa
+            </button>
+        </div>
+    </div>
+    
+    <!-- EDIT PROFILE MODAL -->
+    <div id="editProfileModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-md w-full slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Hariri Profile</h3>
+                <button onclick="closeEditProfileModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="editJina" placeholder="Jina Kamili" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="tel" id="editSimu" placeholder="Namba ya Simu" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="date" id="editDob" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <select id="editJinsia" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                <option value="">Chagua Jinsia</option>
+                <option value="Mwanaume">Mwanaume</option>
+                <option value="Mwanamke">Mwanamke</option>
+            </select>
+            <input type="text" id="editMahali" placeholder="Mahali Unapoishi" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <div class="mb-3">
+                <label class="block text-sm mb-2">Badili Picha</label>
+                <input type="file" id="editPicha" accept="image/*" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3">
+                <img id="editPreviewPicha" class="w-24 h-24 rounded-full mt-2 mx-auto">
+            </div>
+            <button onclick="hifadhiProfile()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold">
+                <i class="fas fa-save mr-2"></i>Hifadhi Mabadiliko
+            </button>
+        </div>
+    </div>
+    
+    <!-- TANGAZO MODAL -->
+    <div id="tangazoModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-md w-full slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Tangazo Jipya</h3>
+                <button onclick="closeTangazoModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="tangazoTitle" placeholder="Kichwa cha Tangazo" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <textarea id="tangazoContent" placeholder="Maelezo ya Tangazo" rows="5" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-4"></textarea>
+            <button onclick="ongezaTangazo()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold">
+                <i class="fas fa-paper-plane mr-2"></i>Chapisha Tangazo
+            </button>
+        </div>
+    </div>
+    
+    <!-- UONGOZI SELECTION MODAL -->
+    <div id="uongoziModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-2xl w-full max-h- overflow-y-auto slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Chagua Uongozi</h3>
+                <button onclick="closeUongoziModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="uongoziSelection" class="space-y-4"></div>
+        </div>
+    </div>
+    
+    <!-- RECEIPT MODAL -->
+    <div id="receiptModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-md w-full slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Receipt ya Mchango</h3>
+                <button onclick="fungaReceipt()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="receiptContent" class="bg-white text-black p-6 rounded-lg"></div>
+            <div class="flex gap-3 mt-4">
+                <button onclick="pakuaReceiptPDF()" class="flex-1 bg-[#088395] py-3 rounded-lg font-semibold">
+                    <i class="fas fa-download mr-2"></i>Pakua PDF
+                </button>
+                <button onclick="fungaReceipt()" class="bg-gray-600 px-6 py-3 rounded-lg">
+                    Funga
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ADD MEMBER MODAL - ADMIN -->
+    <div id="addMemberModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-md w-full slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Ongeza Mwanachama</h3>
+                <button onclick="closeAddMemberModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="addJina" placeholder="Jina Kamili" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="tel" id="addSimu" placeholder="Namba ya Simu" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="password" id="addPassword" placeholder="Neno la Siri" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-4">
+            <button onclick="ongezaMwanachamaAdmin()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold">
+                <i class="fas fa-user-plus mr-2"></i>Ongeza Mwanachama
+            </button>
+        </div>
+    </div>
+    
+    <!-- EDIT GROUP PROFILE MODAL -->
+    <div id="editGroupModal" class="modal fixed inset-0 bg-black/80 z-[100] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-md w-full slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Hariri Profile ya Kikundi</h3>
+                <button onclick="closeEditGroupModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="editGroupName" placeholder="Jina la Kikundi" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <div class="mb-3">
+                <label class="block text-sm mb-2">Logo ya Kikundi</label>
+                <input type="file" id="editGroupLogoFile" accept="image/*" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3">
+                <img id="editGroupLogo" class="w-24 h-24 rounded-full mt-2 mx-auto">
+            </div>
+            <button onclick="hifadhiGroupProfile()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold">
+                <i class="fas fa-save mr-2"></i>Hifadhi
+            </button>
+        </div>
+    </div>
+    
+    <!-- UPLOAD MUSIC MODAL - ADMIN -->
+    <div id="uploadMusicModal" class="modal fixed inset-0 bg-black/80 z-[200] items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl max-w-md w-full slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Pandisha Muziki</h3>
+                <button onclick="closeUploadMusicModal()" class="text-2xl"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="musicTitle" placeholder="Jina la Wimbo" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="text" id="musicArtist" placeholder="Msanii" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+            <input type="file" id="musicFile" accept="audio/*" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-2">
+            <p class="text-xs text-gray-400 mb-4">Max: 2MB - MP3, WAV, M4A. Compress kwanza!</p>
+            <button onclick="uploadMusic()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold">
+                <i class="fas fa-upload mr-2"></i>Pandisha Muziki
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // MAGERI UCHUMI DAIMA - SYSTEM COMPLETE
+        const { jsPDF } = window.jspdf;
+        
+        // DATABASE
+        let db = {
+            wanachama: JSON.parse(localStorage.getItem('mageri_wanachama')) || [],
+            michango: JSON.parse(localStorage.getItem('mageri_michango')) || [],
+            mzunguko: JSON.parse(localStorage.getItem('mageri_mzunguko')) || [],
+            uongozi: JSON.parse(localStorage.getItem('mageri_uongozi')) || {
+                mwenyekiti: null,
+                katibu: null,
+                mhazini: null
+            },
+            matangazo: JSON.parse(localStorage.getItem('mageri_matangazo')) || [],
+            meetings: JSON.parse(localStorage.getItem('mageri_meetings')) || [],
+            music: JSON.parse(localStorage.getItem('mageri_music')) || [],
+            kura: JSON.parse(localStorage.getItem('mageri_kura')) || [],
+            mipangilio: JSON.parse(localStorage.getItem('mageri_mipangilio')) || {
+                jina: 'MAGERI UCHUMI DAIMA',
+                groupLogo: 'https://ui-avatars.com/api/?name=MAGERI&background=05bfdb&color=011f26&bold=true',
+                sikuMzunguko: 7,
+                mchangoKilaMzunguko: 10000,
+                kuraActive: false,
+                ainaAkaunti: 'Airtel Money',
+                akaunti: '0780000000',
+                jinaAkaunti: 'MAGERI UCHUMI DAIMA'
+            },
+            mzungukoWaSasa: parseInt(localStorage.getItem('mageri_mzunguko_sasa')) || 0
+        };
+        
+        let currentUser = null;
+        let liveMeetingActive = false;
+        let currentSongIndex = 0;
+        let isBackgroundPlaying = false;
+        let musicPlayer = null;
+        
+        // THEME
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            document.getElementById('themeBtn').innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('mageri_theme', isLight ? 'light' : 'dark');
+            showToast(isLight ? '☀️ Light mode' : '🌙 Dark mode');
+        }
+        
+        if (localStorage.getItem('mageri_theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+        
+        // INIT ADMIN
+        if (!db.wanachama.find(w => w.simu === '0780000000')) {
+            db.wanachama.push({
+                id: 1,
+                jina: 'Admin MAGERI',
+                simu: '0780000000',
+                password: 'admin123',
+                picha: 'https://ui-avatars.com/api/?name=Admin&background=05bfdb&color=011f26',
+                dob: '1990-01-01',
+                jinsia: 'Mwanaume',
+                mahali: 'Dar es Salaam',
+                tareheKujiunga: new Date().toISOString()
+            });
+            db.mzunguko.push(1);
+            localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
+            localStorage.setItem('mageri_mzunguko', JSON.stringify(db.mzunguko));
+        }
+        
+        // UTILITY FUNCTIONS
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast glass p-4 rounded-lg ${type === 'error'? 'border-red-500' : 'border-green-500'}`;
+            toast.innerHTML = `<p class="text-sm"><i class="fas fa-${type === 'error'? 'exclamation-circle' : 'check-circle'} mr-2"></i>${msg}</p>`;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function isAdmin(id) {
+            return id === 1;
+        }
+        
+        function isUongozi(id) {
+            return Object.values(db.uongozi).includes(id);
+        }
+        
+        function getUongoziTitle(id) {
+            if (db.uongozi.mwenyekiti === id) return 'Mwenyekiti';
+            if (db.uongozi.katibu === id) return 'Katibu';
+            if (db.uongozi.mhazini === id) return 'Mweka Hazina';
+            return null;
+        }
+        
+        function tumaWhatsApp(namba, ujumbe) {
+            const cleanNum = namba.replace(/[^0-9]/g, '');
+            const url = `https://wa.me/${cleanNum}?text=${encodeURIComponent(ujumbe)}`;
+            window.open(url, '_blank');
+        }
+        // PAGE LOADERS
+        function loadGroupProfile() {
+            document.getElementById('groupName').textContent = db.mipangilio.jina;
+            document.getElementById('groupLogo').src = db.mipangilio.groupLogo;
+            document.getElementById('editGroupLogo').src = db.mipangilio.groupLogo;
+            document.getElementById('editGroupName').value = db.mipangilio.jina;
+        }
+
+        function loadHomePage() {
+            document.getElementById('totalMembers').textContent = db.wanachama.length;
+            document.getElementById('totalMichango').textContent = `TZS ${db.michango.reduce((s, m) => s + m.kiasi, 0).toLocaleString()}`;
+            document.getElementById('currentMzunguko').textContent = db.mzungukoWaSasa + 1;
+
+            const nextMpokeaji = db.mzunguko[db.mzungukoWaSasa];
+            const member = db.wanachama.find(w => w.id === nextMpokeaji);
+            document.getElementById('nextMpokeaji').textContent = member? member.jina.split(' ')[0] : '-';
+
+            loadCalendarMizunguko();
+            loadMatangazo();
+            loadMusicPage();
+            loadLocationInfo();
+            checkLiveMeetingStatus();
+        }
+
+        function loadCalendarMizunguko() {
+            const container = document.getElementById('calendarMizunguko');
+            container.innerHTML = '';
+
+            db.mzunguko.forEach((mwanachamaId, index) => {
+                const mwanachama = db.wanachama.find(w => w.id === mwanachamaId);
+                const isCurrent = index === db.mzungukoWaSasa;
+                const isPast = index < db.mzungukoWaSasa;
+
+                container.innerHTML += `
+                    <div class="bg-[#011f26] p-3 rounded-lg text-center ${isCurrent? 'border-2 border-[#05bfdb] glow' : ''} ${isPast? 'opacity-50' : ''}">
+                        <p class="text-xs text-gray-400 mb-1">Mzunguko ${index + 1}</p>
+                        <p class="font-bold text-sm">${mwanachama? mwanachama.jina.split(' ')[0] : '-'}</p>
+                        ${isCurrent? '<p class="text-xs text-[#05bfdb] mt-1">SASA</p>' : ''}
+                        ${isPast? '<p class="text-xs text-green-500 mt-1"><i class="fas fa-check"></i></p>' : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function loadMatangazo() {
+            const container = document.getElementById('matangazoList');
+            const isAdminOrUongozi = currentUser && (isAdmin(currentUser.id) || isUongozi(currentUser.id));
+
+            if(isAdminOrUongozi) document.getElementById('addTangazoBtn').classList.remove('hidden');
+
+            if(db.matangazo.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">Hakuna matangazo</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            db.matangazo.slice().reverse().forEach(t => {
+                const mtoa = db.wanachama.find(w => w.id === t.mtoaId);
+                container.innerHTML += `
+                    <div class="bg-[#011f26] p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-[#05bfdb]">${t.title}</h4>
+                            <span class="text-xs text-gray-400">${new Date(t.tarehe).toLocaleDateString()}</span>
+                        </div>
+                        <p class="text-sm text-gray-300">${t.content}</p>
+                        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-user mr-1"></i>${mtoa? mtoa.jina : 'System'}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function loadLocationInfo() {
+            const container = document.getElementById('wanachamaPublicList');
+            if(!container) return;
+            container.innerHTML = '';
+
+            db.wanachama.slice(0, 12).forEach(w => {
+                const nafasi = getUongoziTitle(w.id);
+                container.innerHTML += `
+                    <div class="glass p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer" onclick="viewMemberProfile(${w.id})">
+                        <img src="${w.picha}" class="w-20 h-20 rounded-full mx-auto mb-2 border-2 border-[#05bfdb]">
+                        <p class="font-bold text-sm">${w.jina}</p>
+                        <p class="text-xs text-gray-400">${w.simu}</p>
+                        ${nafasi? `<span class="text-xs bg-[#088395] px-2 py-1 rounded-full mt-1 inline-block">${nafasi}</span>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        // MUSIC FUNCTIONS - ADMIN FIXED
+        function loadMusicPage() {
+            const canUpload = isAdmin(currentUser?.id);
+            const uploadBtn = document.getElementById('uploadMusicBtn');
+
+            if(uploadBtn) {
+                uploadBtn.style.display = canUpload? 'block' : 'none';
+            }
+
+            const container = document.getElementById('musicList');
+            if(!container) return;
+
+            try {
+                const stored = localStorage.getItem('mageri_music');
+                db.music = stored? JSON.parse(stored) : [];
+            } catch(e) {
+                db.music = [];
+            }
+
+            let total = 0;
+            for(let key in localStorage) {
+                if(localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length * 2;
+                }
+            }
+            const mb = (total / 1024 / 1024).toFixed(2);
+
+            container.innerHTML = `
+                <div class="bg-yellow-900/20 border border-yellow-600 p-3 rounded-lg mb-4 text-xs">
+                    <p><i class="fas fa-info-circle mr-1"></i>Storage: ${mb}MB / 5MB</p>
+                    ${mb > 4? '<p class="text-red-400 mt-1">⚠️ Storage karibu kujaa! Futa muziki wa zamani.</p>' : ''}
+                </div>
+            `;
+
+            if(db.music.length === 0) {
+                container.innerHTML += `
+                    <div class="text-center py-8">
+                        <i class="fas fa-music text-6xl text-gray-600 mb-4"></i>
+                        <p class="text-gray-400">Hakuna muziki bado</p>
+                        ${canUpload? '<p class="text-sm text-gray-500 mt-2">Bonyeza "Pandisha Muziki" kuongeza</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML += `
+                <div class="bg-[#011f26] p-4 rounded-lg mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold"><i class="fas fa-list-music mr-2"></i>Playlist - Nyimbo ${db.music.length}</h4>
+                        <div class="flex gap-2">
+                            ${canUpload? `
+                            <button onclick="clearMusicStorage()" class="bg-red-600 px-3 py-1 rounded text-xs">
+                                <i class="fas fa-trash mr-1"></i>Futa Zote
+                            </button>
+                            ` : ''}
+                            <button onclick="playAllMusic()" class="bg-green-600 px-3 py-1 rounded text-xs">
+                                <i class="fas fa-play mr-1"></i>Play All
+                            </button>
+                            <button onclick="toggleBackgroundMusic()" id="bgMusicBtn" class="bg-purple-600 px-3 py-1 rounded text-xs">
+                                <i class="fas fa-music mr-1"></i>Background
+                            </button>
+                        </div>
+                    <audio id="mainMusicPlayer" controls class="w-full mb-2" onended="playNextSong()" onplay="updateNowPlaying()" onpause="updateNowPlaying()"></audio>
+                    <p id="nowPlaying" class="text-sm text-center text-gray-400">Hakuna wimbo unaocheza</p>
+                </div>
+                <div id="playlistContainer"></div>
+            `;
+
+            musicPlayer = document.getElementById('mainMusicPlayer');
+            const playlistContainer = document.getElementById('playlistContainer');
+
+            db.music.forEach((song, index) => {
+                const uploader = db.wanachama.find(w => w.id === song.uploadedBy);
+                const isPlaying = currentSongIndex === index && musicPlayer &&!musicPlayer.paused;
+
+                playlistContainer.innerHTML += `
+                    <div class="bg-[#011f26] p-4 rounded-lg flex items-center justify-between hover:bg-[#0a4d68] transition mb-2 ${currentSongIndex === index? 'border-2 border-[#05bfdb]' : ''}">
+                        <div class="flex items-center gap-3 flex-1">
+                            <div class="bg-[#088395] w-12 h-12 rounded-lg flex items-center justify-center">
+                                ${isPlaying? '<i class="fas fa-volume-up animate-pulse"></i>' : `<span class="font-bold">${index + 1}</span>`}
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold">${song.title}</p>
+                                <p class="text-xs text-gray-400">${song.artist} • ${uploader?.jina || 'Admin'}</p>
+                                <p class="text-xs text-gray-500">${(song.fileSize/1024/1024).toFixed(2)}MB</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="playMusic(${index})" class="bg-green-600 px-4 py-2 rounded-lg">
+                                <i class="fas fa-${isPlaying? 'pause' : 'play'}"></i>
+                            </button>
+                            ${canUpload? `<button onclick="deleteMusic(${song.id})" class="bg-red-600 px-3 py-2 rounded-lg"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showUploadMusicModal() {
+            if(!isAdmin(currentUser?.id)) return showToast('Admin tu anaweza kupandisha muziki', 'error');
+            document.getElementById('uploadMusicModal').classList.add('active');
+        }
+
+        function closeUploadMusicModal() {
+            document.getElementById('uploadMusicModal').classList.remove('active');
+            document.getElementById('musicTitle').value = '';
+            document.getElementById('musicArtist').value = '';
+            document.getElementById('musicFile').value = '';
+        }
+
+        function uploadMusic() {
+            const title = document.getElementById('musicTitle').value.trim();
+            const artist = document.getElementById('musicArtist').value.trim();
+            const fileInput = document.getElementById('musicFile');
+
+            if(!title ||!artist) return showToast('Jaza jina la wimbo na msanii', 'error');
+            if(!fileInput.files ||!fileInput.files[0]) return showToast('Chagua file ya muziki', 'error');
+
+            const file = fileInput.files[0];
+
+            if(file.size > 2 * 1024 * 1024) {
+                return showToast('File kubwa! Tumia MP3 chini ya 2MB. Compress kwanza', 'error');
+            }
+
+            if(!file.type.startsWith('audio/')) {
+                return showToast('Chagua MP3/WAV/M4A tu', 'error');
+            }
+
+            let total = 0;
+            for(let key in localStorage) {
+                if(localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length * 2;
+                }
+            }
+            const mb = (total / 1024 / 1024).toFixed(2);
+            if(mb > 4) {
+                return showToast('⚠️ Storage imejaa! Futa muziki wa zamani kwanza', 'error');
+            }
+
+            showToast('⏳ Inapandisha...');
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const music = {
+                        id: Date.now(),
+                        title: title,
+                        artist: artist,
+                        data: e.target.result,
+                        fileName: file.name,
+                        fileSize: file.size,
+                        uploadedBy: currentUser.id,
+                        uploadDate: new Date().toISOString()
+                    };
+
+                    db.music.push(music);
+
+                    try {
+                        localStorage.setItem('mageri_music', JSON.stringify(db.music));
+                    } catch(storageErr) {
+                        db.music.pop();
+                        return showToast('❌ Storage imejaa! Futa muziki wa zamani', 'error');
+                    }
+
+                    const message = `*MAGERI UCHUMI DAIMA*\n\n🎵 *Muziki Mpya!*\n\n🎤 ${title}\n👤 ${artist}\n📁 ${(file.size/1024/1024).toFixed(2)}MB\n\nIngia kwenye app kusikiliza!\n\n_Imeongezwa na: ${currentUser.jina}_`;
+
+                    db.wanachama.forEach(w => {
+                        tumaWhatsApp(w.simu, message);
+                    });
+
+                    closeUploadMusicModal();
+                    loadMusicPage();
+                    showToast('✅ Muziki umepandishwa!');
+                } catch(err) {
+                    console.error(err);
+                    showToast('Imeshindwa kuhifadhi', 'error');
+                }
+            };
+
+            reader.onerror = function() {
+                showToast('Imeshindwa kusoma file', 'error');
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function playMusic(index) {
+            const song = db.music[index];
+            if(!song) return showToast('Wimbo haujaonekana', 'error');
+
+            const player = document.getElementById('mainMusicPlayer');
+            if(!player) return showToast('Player haipo', 'error');
+
+            currentSongIndex = index;
+
+            if(!player.paused) player.pause();
+
+            player.src = song.data;
+
+            player.play().then(() => {
+                updateNowPlaying();
+                loadMusicPage();
+                showToast(`🎵 Inacheza: ${song.title}`);
+            }).catch(err => {
+                console.error('Play error:', err);
+                showToast('Imeshindwa kucheza. Tumia MP3 format', 'error');
+            });
+        }
+
+        function updateNowPlaying() {
+            const player = document.getElementById('mainMusicPlayer');
+            const nowPlaying = document.getElementById('nowPlaying');
+            if(!player ||!nowPlaying) return;
+
+            if(!player.paused && db.music[currentSongIndex]) {
+                const song = db.music[currentSongIndex];
+                nowPlaying.innerHTML = `<i class="fas fa-volume-up text-green-500 mr-1"></i> Inacheza: <span class="font-bold">${song.title}</span> - ${song.artist}`;
+            } else {
+                nowPlaying.textContent = 'Hakuna wimbo unaocheza';
+            }
+        }
+
+        function playNextSong() {
+            if(currentSongIndex < db.music.length - 1) {
+                playMusic(currentSongIndex + 1);
+            } else {
+                playMusic(0);
+            }
+        }
+
+        function playAllMusic() {
+            if(db.music.length === 0) return showToast('Hakuna muziki', 'error');
+            playMusic(0);
+            showToast('🎵 Playlist imeanza');
+        }
+
+        function toggleBackgroundMusic() {
+            const btn = document.getElementById('bgMusicBtn');
+            const player = document.getElementById('mainMusicPlayer');
+            if(!player) return;
+
+            if(!isBackgroundPlaying) {
+                if(db.music.length === 0) return showToast('Hakuna muziki', 'error');
+                if(!player.src && db.music.length > 0) {
+                    player.src = db.music[0].data;
+                    currentSongIndex = 0;
+                }
+                player.loop = true;
+                player.play().then(() => {
+                    isBackgroundPlaying = true;
+                    btn.innerHTML = '<i class="fas fa-pause mr-1"></i>Stop BG';
+                    btn.className = 'bg-red-600 px-3 py-1 rounded text-xs';
+                    updateNowPlaying();
+                    showToast('🎵 Background music imeanza');
+                }).catch(err => {
+                    showToast('Imeshindwa kucheza', 'error');
+                });
+            } else {
+                player.pause();
+                player.loop = false;
+                isBackgroundPlaying = false;
+                btn.innerHTML = '<i class="fas fa-music mr-1"></i>Background';
+                btn.className = 'bg-purple-600 px-3 py-1 rounded text-xs';
+                updateNowPlaying();
+                showToast('⏸️ Background music imesimama');
+            }
+        }
+
+        function deleteMusic(id) {
+            if(!isAdmin(currentUser?.id)) return showToast('Admin tu anaweza kufuta', 'error');
+
+            if(confirm('Una uhakika unataka kufuta wimbo huu?')) {
+                const player = document.getElementById('mainMusicPlayer');
+                if(player &&!player.paused) player.pause();
+
+                db.music = db.music.filter(m => m.id!== id);
+                localStorage.setItem('mageri_music', JSON.stringify(db.music));
+
+                if(currentSongIndex >= db.music.length) currentSongIndex = 0;
+
+                loadMusicPage();
+                showToast('✅ Muziki umefutwa');
+            }
+        }
+
+        function clearMusicStorage() {
+            if(!confirm('Una uhakika unataka kufuta muziki wote? Hii itafuta storage ili uweze kupandisha upya.')) return;
+
+            localStorage.removeItem('mageri_music');
+            db.music = [];
+            showToast('✅ Storage imesafishwa! Sasa unaweza kupandisha');
+            loadMusicPage();
+        }
+
+        // AUTH FUNCTIONS
+        function showLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+        function showRegisterModal() { document.getElementById('registerModal').classList.add('active'); }
+        function closeRegisterModal() { document.getElementById('registerModal').classList.remove('active'); }
+
+        document.getElementById('regPicha')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    document.getElementById('previewPicha').src = ev.target.result;
+                    document.getElementById('previewPicha').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function login() {
+            const simu = document.getElementById('loginSimu').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if(!simu ||!password) return showToast('Jaza sehemu zote', 'error');
+
+            const user = db.wanachama.find(w => w.simu === simu && w.password === password);
+
+            if(user) {
+                currentUser = user;
+                localStorage.setItem('mageri_current_user', JSON.stringify(user));
+                closeLoginModal();
+                showMemberDashboard();
+                showToast('Karibu ' + user.jina);
+            } else {
+                showToast('Namba au neno la siri si sahihi', 'error');
+            }
+        }
+        function jisajiliMwanachama() {
+            const jina = document.getElementById('regJina').value.trim();
+            const simu = document.getElementById('regSimu').value.trim();
+            const dob = document.getElementById('regDob').value;
+            const jinsia = document.getElementById('regJinsia').value;
+            const mahali = document.getElementById('regMahali').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const pichaFile = document.getElementById('regPicha').files[0];
+
+            if(!jina ||!simu ||!dob ||!jinsia ||!mahali ||!password) return showToast('Jaza sehemu zote', 'error');
+            if(password!== confirmPassword) return showToast('Neno la siri hazifanani', 'error');
+            if(password.length < 4) return showToast('Neno la siri liwe na angalau herufi 4', 'error');
+            if(db.wanachama.find(w => w.simu === simu)) return showToast('Namba hii imeshasajiliwa', 'error');
+
+            let picha = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(jina) + '&background=05bfdb&color=011f26';
+
+            const processRegistration = () => {
+                const newId = db.wanachama.length > 0? Math.max(...db.wanachama.map(w => w.id)) + 1 : 1;
+                const newMember = {
+                    id: newId,
+                    jina, simu, dob, jinsia, mahali, password, picha,
+                    tareheKujiunga: new Date().toISOString()
+                };
+
+                db.wanachama.push(newMember);
+                db.mzunguko.push(newId);
+                localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
+                localStorage.setItem('mageri_mzunguko', JSON.stringify(db.mzunguko));
+
+                const welcomeMsg = `*MAGERI UCHUMI DAIMA*\n\nHongera ${jina}!\n\nUmefanikiwa kujiunga rasmi. Karibu kwenye familia ya MAGERI.\n\n📱 Namba yako: ${simu}\n🔑 Neno la siri: ${password}\n📅 Tarehe: ${new Date().toLocaleDateString()}\n\n🔥 Wewe ni mwanachama wa ${db.wanachama.length}\n💰 Mchango kwa mzunguko: TZS ${db.mipangilio.mchangoKilaMzunguko.toLocaleString()}\n📊 Mzunguko wako: #${db.mzunguko.length}\n\n⚠️ Hifadhi neno la siri kwa usalama!\n\nKaribu tena!`;
+
+                tumaWhatsApp(simu, welcomeMsg);
+
+                setTimeout(() => {
+                    window.open(`sms:${simu.replace(/[^0-9]/g, '')}?body=${encodeURIComponent('MAGERI UCHUMI DAIMA: Hongera! Umefanikiwa kujiunga rasmi. Namba: ' + simu + ' Password: ' + password)}`, '_self');
+                    showToast('📱 SMS ya uthibitisho imetumwa');
+                }, 1000);
+
+                closeRegisterModal();
+                showToast('Umefanikiwa kujiunga! Angalia SMS/WhatsApp yako');
+                loadHomePage();
+            };
+
+            if(pichaFile) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    picha = e.target.result;
+                    processRegistration();
+                };
+                reader.readAsDataURL(pichaFile);
+            } else {
+                processRegistration();
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('mageri_current_user');
+            document.getElementById('memberDashboard').classList.add('hidden');
+            document.getElementById('home').classList.remove('hidden');
+            updateNavStatus();
+            showToast('Umeondoka salama');
+        }
+
+        function checkUserSession() {
+            const saved = localStorage.getItem('mageri_current_user');
+            if(saved) {
+                currentUser = JSON.parse(saved);
+                showMemberDashboard();
+            }
+            updateNavStatus();
+        }
+
+        function updateNavStatus() {
+            const statusEl = document.getElementById('userStatusNav');
+            const loginBtn = document.getElementById('loginBtnNav');
+
+            if(currentUser) {
+                const nafasi = getUongoziTitle(currentUser.id);
+                statusEl.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <img src="${currentUser.picha}" class="w-8 h-8 rounded-full border border-[#05bfdb]">
+                        <div class="text-left">
+                            <p class="text-sm font-semibold">${currentUser.jina.split(' ')[0]}</p>
+                            ${nafasi? `<p class="text-xs text-[#05bfdb]">${nafasi}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+                loginBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i>Toka';
+                loginBtn.onclick = logout;
+            } else {
+                statusEl.innerHTML = '';
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-1"></i>Ingia';
+                loginBtn.onclick = showLoginModal;
+            }
+        }
+
+        function goHome() {
+            document.getElementById('wanachamaFullPage').classList.add('hidden');
+            document.getElementById('memberDashboard').classList.add('hidden');
+            document.getElementById('home').classList.remove('hidden');
+        }
+
+        function showWanachamaFull() {
+            document.getElementById('home').classList.add('hidden');
+            document.getElementById('wanachamaFullPage').classList.remove('hidden');
+            loadWanachamaFull();
+        }
+
+        function loadWanachamaFull() {
+            const container = document.getElementById('wanachamaPublicListFull');
+            container.innerHTML = '';
+
+            db.wanachama.forEach(w => {
+                const nafasi = getUongoziTitle(w.id);
+                container.innerHTML += `
+                    <div class="glass p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer" onclick="viewMemberProfile(${w.id})">
+                        <img src="${w.picha}" class="w-24 h-24 rounded-full mx-auto mb-2 border-2 border-[#05bfdb]">
+                        <p class="font-bold">${w.jina}</p>
+                        <p class="text-xs text-gray-400">${w.simu}</p>
+                        <p class="text-xs text-gray-500">${w.mahali}</p>
+                        ${nafasi? `<span class="text-xs bg-[#088395] px-2 py-1 rounded-full mt-1 inline-block">${nafasi}</span>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function searchWanachamaPublic() {
+            const search = document.getElementById('searchWanachamaPublic').value.toLowerCase();
+            const filtered = db.wanachama.filter(w =>
+                w.jina.toLowerCase().includes(search) ||
+                w.simu.includes(search) ||
+                w.mahali.toLowerCase().includes(search)
+            );
+
+            const container = document.getElementById('wanachamaPublicListFull');
+            container.innerHTML = '';
+
+            filtered.forEach(w => {
+                const nafasi = getUongoziTitle(w.id);
+                container.innerHTML += `
+                    <div class="glass p-4 rounded-xl text-center hover:scale-105 transition cursor-pointer" onclick="viewMemberProfile(${w.id})">
+                        <img src="${w.picha}" class="w-24 h-24 rounded-full mx-auto mb-2 border-2 border-[#05bfdb]">
+                        <p class="font-bold">${w.jina}</p>
+                        <p class="text-xs text-gray-400">${w.simu}</p>
+                        <p class="text-xs text-gray-500">${w.mahali}</p>
+                        ${nafasi? `<span class="text-xs bg-[#088395] px-2 py-1 rounded-full mt-1 inline-block">${nafasi}</span>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function viewMemberProfile(id) {
+            const m = db.wanachama.find(w => w.id === id);
+            if(!m) return;
+
+            const nafasi = getUongoziTitle(id);
+            const mchangoCount = db.michango.filter(mc => mc.mwanachamaId === id).length;
+
+            alert(`Jina: ${m.jina}\nSimu: ${m.simu}\nMahali: ${m.mahali}\n${nafasi? 'Nafasi: ' + nafasi + '\n' : ''}Mchango: ${mchangoCount} mara\nAlijiunga: ${new Date(m.tareheKujiunga).toLocaleDateString()}`);
+        }
+
+        // MEMBER DASHBOARD
+        function showMemberDashboard() {
+            document.getElementById('home').classList.add('hidden');
+            document.getElementById('memberDashboard').classList.remove('hidden');
+            loadMemberDashboard();
+            loadMusicPage();
+        }
+
+        function loadMemberDashboard() {
+            const dashboard = document.getElementById('memberDashboard');
+            const nafasi = getUongoziTitle(currentUser.id);
+            const isAdminUser = isAdmin(currentUser.id);
+            const isUongoziUser = isUongozi(currentUser.id);
+            
+            dashboard.innerHTML = `
+                <div class="max-w-7xl mx-auto p-4 py-8">
+                    <div class="glass p-6 rounded-2xl mb-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <img src="${currentUser.picha}" class="w-20 h-20 rounded-full border-4 border-[#05bfdb]">
+                                <div>
+                                    <h2 class="text-2xl font-bold">${currentUser.jina}</h2>
+                                    <p class="text-gray-400">${currentUser.simu}</p>
+                                    ${nafasi? `<span class="text-sm bg-[#088395] px-3 py-1 rounded-full mt-1 inline-block">${nafasi}</span>` : ''}
+                                    ${isAdminUser? `<span class="text-sm bg-red-600 px-3 py-1 rounded-full mt-1 inline-block ml-2">ADMIN</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="showEditProfileModal()" class="bg-[#088395] px-4 py-2 rounded-lg">
+                                    <i class="fas fa-edit mr-1"></i>Hariri
+                                </button>
+                                <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg">
+                                    <i class="fas fa-sign-out-alt mr-1"></i>Toka
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="glass p-4 rounded-xl text-center">
+                            <i class="fas fa-calendar-check text-3xl text-[#05bfdb] mb-2"></i>
+                            <p class="text-2xl font-bold">${db.michango.filter(m => m.mwanachamaId === currentUser.id).length}</p>
+                            <p class="text-xs text-gray-400">Michango Yangu</p>
+                        </div>
+                        <div class="glass p-4 rounded-xl text-center">
+                            <i class="fas fa-coins text-3xl text-[#088395] mb-2"></i>
+                            <p class="text-2xl font-bold">TZS ${db.michango.filter(m => m.mwanachamaId === currentUser.id).reduce((s, m) => s + m.kiasi, 0).toLocaleString()}</p>
+                            <p class="text-xs text-gray-400">Jumla Niliyolipa</p>
+                        </div>
+                        <div class="glass p-4 rounded-xl text-center">
+                            <i class="fas fa-list-ol text-3xl text-[#05bfdb] mb-2"></i>
+                            <p class="text-2xl font-bold">${db.mzunguko.indexOf(currentUser.id) + 1}</p>
+                            <p class="text-xs text-gray-400">Nafasi Yangu</p>
+                        </div>
+                        <div class="glass p-4 rounded-xl text-center">
+                            <i class="fas fa-clock text-3xl text-[#088395] mb-2"></i>
+                            <p class="text-2xl font-bold">${db.mzungukoWaSasa + 1}</p>
+                            <p class="text-xs text-gray-400">Mzunguko Sasa</p>
+                        </div>
+                    </div>
+
+                    <div class="glass p-2 rounded-xl mb-6">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="switchMemberTab('mchango')" class="member-tab-btn flex-1 px-4 py-3 rounded-lg bg-[#088395]" data-tab="mchango">
+                                <i class="fas fa-money-bill-wave mr-1"></i>Lipa Mchango
+                            </button>
+                            <button onclick="switchMemberTab('kalenda')" class="member-tab-btn flex-1 px-4 py-3 rounded-lg" data-tab="kalenda">
+                                <i class="fas fa-calendar mr-1"></i>Kalenda
+                            </button>
+                            <button onclick="switchMemberTab('meeting')" class="member-tab-btn flex-1 px-4 py-3 rounded-lg" data-tab="meeting">
+                                <i class="fas fa-video mr-1"></i>Mkutano
+                            </button>
+                            <button onclick="switchMemberTab('matangazo')" class="member-tab-btn flex-1 px-4 py-3 rounded-lg" data-tab="matangazo">
+                                <i class="fas fa-bullhorn mr-1"></i>Matangazo
+                            </button>
+                            <button onclick="switchMemberTab('wanachama')" class="member-tab-btn flex-1 px-4 py-3 rounded-lg" data-tab="wanachama">
+                                <i class="fas fa-users mr-1"></i>Wanachama
+                            </button>
+                            ${isAdminUser? `
+                            <button onclick="switchMemberTab('musicAdmin')" class="member-tab-btn flex-1 px-4 py-3 rounded-lg" data-tab="musicAdmin">
+                                <i class="fas fa-music mr-1"></i>Muziki
+                            </button>
+                            ` : ''}
+                            ${isUongoziUser || isAdminUser? `
+                            <button onclick="switchMemberTab('uongozi')" class="member-tab-btn flex-1 px-4 py-3 rounded-lg" data-tab="uongozi">
+                                <i class="fas fa-user-tie mr-1"></i>Uongozi
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <div id="memberTabContent">
+                        <div id="mchango" class="member-tab-content active"></div>
+                        <div id="kalenda" class="member-tab-content"></div>
+                        <div id="meeting" class="member-tab-content"></div>
+                        <div id="matangazo" class="member-tab-content"></div>
+                        <div id="wanachama" class="member-tab-content"></div>
+                        ${isAdminUser? '<div id="musicAdmin" class="member-tab-content"></div>' : ''}
+                        ${isUongoziUser || isAdminUser? '<div id="uongozi" class="member-tab-content"></div>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            switchMemberTab('mchango');
+        }
+        function switchMemberTab(tabName) {
+            document.querySelectorAll('.member-tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.member-tab-btn').forEach(btn => btn.classList.remove('bg-[#088395]'));
+            
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('bg-[#088395]');
+            
+            if (tabName === 'mchango') loadMchangoTab();
+            else if (tabName === 'kalenda') loadKalendaTab();
+            else if (tabName === 'meeting') loadMeetingTab();
+            else if (tabName === 'matangazo') loadMatangazoTab();
+            else if (tabName === 'wanachama') loadWanachamaTab();
+            else if (tabName === 'musicAdmin') loadMusicAdminTab(); // ONGEZA HII
+            else if (tabName === 'uongozi') loadUongoziTab();
+        }""
+        // MUSIC ADMIN TAB - FIXED
+        function loadMusicAdminTab() {
+            const tabContent = document.getElementById('musicAdmin');
+            if (!tabContent) {
+                console.error('musicAdmin div haipo');
+                return showToast('Error: Tab ya muziki haipo', 'error');
+            }
+            
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length * 2;
+                }
+            }
+            const mb = (total / 1024 / 1024).toFixed(2);
+            
+            tabContent.innerHTML = `
+                <div class="glass p-6 rounded-xl">
+                    <h3 class="font-bold text-xl mb-6"><i class="fas fa-music mr-2"></i>Simamia Muziki wa Kikundi</h3>
+
+                    <div class="bg-yellow-900/20 border border-yellow-600 p-3 rounded-lg mb-6 text-xs">
+                        <p><i class="fas fa-info-circle mr-1"></i>Storage: ${mb}MB / 5MB</p>
+                        ${mb > 4? '<p class="text-red-400 mt-1">⚠️ Storage karibu kujaa! Futa muziki wa zamani.</p>' : ''}
+                    </div>
+
+                    <div class="bg-[#011f26] p-6 rounded-lg mb-6">
+                        <h4 class="font-bold mb-4">Pandisha Muziki Mpya</h4>
+                        <input type="text" id="musicTitleAdmin" placeholder="Jina la Wimbo" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                        <input type="text" id="musicArtistAdmin" placeholder="Jina la Msanii" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                        <input type="file" id="musicFileAdmin" accept="audio/*" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-2">
+                        <p class="text-xs text-gray-400 mb-4">Max: 2MB - MP3, WAV, M4A. Compress kwanza!</p>
+                        <button onclick="uploadMusicAdmin()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold hover:bg-[#05bfdb] hover:text-[#011f26] transition">
+                            <i class="fas fa-upload mr-2"></i>Pandisha Muziki
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold">Orodha ya Nyimbo (${db.music.length})</h4>
+                        <button onclick="clearMusicStorage()" class="bg-red-600 px-4 py-2 rounded-lg text-sm">
+                            <i class="fas fa-trash mr-1"></i>Futa Zote
+                        </button>
+                    </div>
+
+                    <div id="musicListAdmin" class="space-y-3">
+                        ${db.music.length === 0? `
+                            <div class="text-center py-8">
+                                <i class="fas fa-music text-6xl text-gray-600 mb-4"></i>
+                                <p class="text-gray-400">Hakuna muziki bado</p>
+                            </div>
+                        ` : db.music.map((song, index) => {
+                            const uploader = db.wanachama.find(w => w.id === song.uploadedBy);
+                            return `
+                                <div class="bg-[#011f26] p-4 rounded-lg flex items-center justify-between hover:bg-[#0a4d68] transition">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <div class="bg-[#088395] w-12 h-12 rounded-lg flex items-center justify-center">
+                                            <span class="font-bold">${index + 1}</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-bold">${song.title}</p>
+                                            <p class="text-xs text-gray-400">${song.artist} • ${uploader?.jina || 'Admin'}</p>
+                                            <p class="text-xs text-gray-500">${(song.fileSize/1024/1024).toFixed(2)}MB • ${new Date(song.uploadDate).toLocaleDateString()}</p>
+                                        </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="playMusicPreview(${index})" class="bg-green-600 px-4 py-2 rounded-lg">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <button onclick="deleteMusic(${song.id})" class="bg-red-600 px-3 py-2 rounded-lg">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <audio id="musicPreviewPlayer" controls class="w-full mt-4" style="display: none;"></audio>
+                </div>
+            `;
+        }
+        
+        function uploadMusicAdmin() {
+            const title = document.getElementById('musicTitleAdmin').value.trim();
+            const artist = document.getElementById('musicArtistAdmin').value.trim();
+            const fileInput = document.getElementById('musicFileAdmin');
+            
+            if (!title || !artist) return showToast('Jaza jina la wimbo na msanii', 'error');
+            if (!fileInput.files || !fileInput.files[0]) return showToast('Chagua file ya muziki', 'error');
+            
+            const file = fileInput.files[0];
+            
+            if (file.size > 2 * 1024 * 1024) {
+                return showToast('File kubwa! Tumia MP3 chini ya 2MB. Compress kwanza', 'error');
+            }
+            
+            if (!file.type.startsWith('audio/')) {
+                return showToast('Chagua MP3/WAV/M4A tu', 'error');
+            }
+            
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length * 2;
+                }
+            }
+            const mb = (total / 1024).toFixed(2);
+            if (mb > 4) {
+                return showToast('⚠️ Storage imejaa! Futa muziki wa zamani kwanza', 'error');
+            }
+            
+            showToast('⏳ Inapandisha...');
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const music = {
+                        id: Date.now(),
+                        title: title,
+                        artist: artist,
+                        data: e.target.result,
+                        fileName: file.name,
+                        fileSize: file.size,
+                        uploadedBy: currentUser.id,
+                        uploadDate: new Date().toISOString()
+                    };
+                    
+                    db.music.push(music);
+                    
+                    try {
+                        localStorage.setItem('mageri_music', JSON.stringify(db.music));
+                    } catch (storageErr) {
+                        db.music.pop();
+                        return showToast('❌ Storage imejaa! Futa muziki wa zamani', 'error');
+                    }
+                    
+                    const message = `*MAGERI UCHUMI DAIMA*\n\n🎵 *Muziki Mpya!*\n\n🎤 ${title}\n👤 ${artist}\n📁 ${(file.size/1024/1024).toFixed(2)}MB\n\nIngia kwenye app kusikiliza!\n\n_Imeongezwa na: ${currentUser.jina}_`;
+                    
+                    db.wanachama.forEach(w => {
+                        tumaWhatsApp(w.simu, message);
+                    });
+                    
+                    document.getElementById('musicTitleAdmin').value = '';
+                    document.getElementById('musicArtistAdmin').value = '';
+                    document.getElementById('musicFileAdmin').value = '';
+                    
+                    loadMusicAdminTab();
+                    loadMusicPage();
+                    showToast('✅ Muziki umepandishwa!');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Imeshindwa kuhifadhi', 'error');
+                }
+            };
+            
+            reader.onerror = function() {
+                showToast('Imeshindwa kusoma file', 'error');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function playMusicPreview(index) {
+            const song = db.music[index];
+            if (!song) return;
+            
+            const player = document.getElementById('musicPreviewPlayer');
+            player.src = song.data;
+            player.style.display = 'block';
+            player.play();
+            showToast(`🎵 Inacheza: ${song.title}`);
+        }
+
+        function switchMemberTab(tabName) {
+            document.querySelectorAll('.member-tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.member-tab-btn').forEach(btn => btn.classList.remove('bg-[#088395]'));
+            
+            const activeTab = document.getElementById(tabName);
+            const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            
+            if (activeTab) activeTab.classList.add('active');
+            if (activeBtn) activeBtn.classList.add('bg-[#088395]');
+            
+            if (tabName === 'mchango') loadMchangoTab();
+            else if (tabName === 'kalenda') loadKalendaTab();
+            else if (tabName === 'meeting') loadMeetingTab();
+            else if (tabName === 'matangazo') loadMatangazoTab();
+            else if (tabName === 'wanachama') loadWanachamaTab();
+            else if (tabName === 'musicAdmin') loadMusicAdminTab(); // HII NDIO MUHIMU
+            else if (tabName === 'uongozi') loadUongoziTab();
+        }
+
+        // LIPA MCHANGO TAB - FIXED
+        function loadMchangoTab() {
+            const tayariAmelipa = db.michango.find(m => m.mwanachamaId === currentUser.id && m.mzunguko === db.mzungukoWaSasa);
+
+            const tabContent = document.getElementById('mchango');
+            tabContent.innerHTML = `
+                <div class="max-w-2xl mx-auto glass p-6 rounded-xl">
+                    <h3 class="font-bold text-xl mb-6">Lipa Mchango Wako</h3>
+                    ${tayariAmelipa? `
+                        <div class="bg-green-900/20 border border-green-600 p-6 rounded-lg text-center">
+                            <i class="fas fa-check-circle text-4xl text-green-500 mb-3"></i>
+                            <p class="text-lg font-bold text-green-400">Umeshalipa Mzunguko Huu!</p>
+                            <p class="text-sm text-gray-400 mt-2">TZS ${tayariAmelipa.kiasi.toLocaleString()} - ${new Date(tayariAmelipa.tarehe).toLocaleDateString()}</p>
+                            <p class="text-xs text-gray-500 mt-1">Njia: ${tayariAmelipa.njia} | Ref: ${tayariAmelipa.kumbukumbu}</p>
+                            <button onclick="pakuaReceiptMchango(${tayariAmelipa.id})" class="mt-4 bg-[#088395] px-6 py-2 rounded-lg">
+                                <i class="fas fa-download mr-2"></i>Pakua Receipt PDF
+                            </button>
+                        </div>
+                    ` : `
+                    <div class="bg-[#011f26] p-4 rounded-lg mb-6">
+                        <p class="text-sm text-gray-400">Kiasi cha Kulipa:</p>
+                        <p class="text-3xl font-bold text-green-500">TZS ${db.mipangilio.mchangoKilaMzunguko.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500 mt-2">Mzunguko #${db.mzungukoWaSasa + 1}</p>
+                    </div>
+                    <select id="njiaMalipoMember" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                        <option value="">Chagua Njia ya Malipo</option>
+                        <option value="M-Pesa">M-Pesa</option>
+                        <option value="Airtel Money">Airtel Money</option>
+                        <option value="Halo Pesa">Halo Pesa</option>
+                        <option value="Mixxx by Yas">Mixxx by Yas</option>
+                        <option value="Bank Transfer">Hamisha kutoka Bank 🏧</option>
+                        <option value="Sim Banking">Sim Banking</option>
+                        <option value="Cash">Taslimu kwa Mhazini</option>
+                    </select>
+                    <input type="text" id="kumbukumbuMalipoMember" placeholder="Namba ya Kumbukumbu/Muamalai" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-4">
+                    <div class="bg-yellow-900/20 border border-yellow-600 p-4 rounded-lg mb-4 text-sm">
+                        <p class="font-bold mb-2"><i class="fas fa-info-circle mr-1"></i> Maelekezo:</p>
+                        <p>1. Lipa kwa: <span class="font-bold text-[#05bfdb]">${db.mipangilio.ainaAkaunti}: ${db.mipangilio.akaunti} (${db.mipangilio.jinaAkaunti})</span></p>
+                        <p>2. Weka kumbukumbu namba hapo juu</p>
+                        <p>3. Bonyeza "Thibitisha Malipo"</p>
+                        <p>4. Utapata receipt PDF mara moja</p>
+                    </div>
+                    <button onclick="lipaMchangoMember()" class="w-full bg-green-600 py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                        <i class="fas fa-check-circle mr-2"></i>Thibitisha Nimepeleka Malipo
+                    </button>
+                    `}
+                </div>
+            `;
+        }
+
+        function lipaMchangoMember() {
+            const njia = document.getElementById('njiaMalipoMember').value;
+            const kumbukumbu = document.getElementById('kumbukumbuMalipoMember').value.trim();
+
+            if(!njia) return showToast('Chagua njia ya malipo', 'error');
+            if(!kumbukumbu) return showToast('Weka namba ya kumbukumbu', 'error');
+
+            const tayariAmelipa = db.michango.find(m => m.mwanachamaId === currentUser.id && m.mzunguko === db.mzungukoWaSasa);
+            if(tayariAmelipa) return showToast('Umeshalipa mzunguko huu', 'error');
+
+            const mchango = {
+                id: Date.now(),
+                mwanachamaId: currentUser.id,
+                kiasi: db.mipangilio.mchangoKilaMzunguko,
+                tarehe: new Date().toISOString(),
+                njia: njia,
+                kumbukumbu: kumbukumbu,
+                mzunguko: db.mzungukoWaSasa
+            };
+
+            db.michango.push(mchango);
+            localStorage.setItem('mageri_michango', JSON.stringify(db.michango));
+
+            const nextMpokeaji = db.mzunguko[db.mzungukoWaSasa];
+            const mpokeaji = db.wanachama.find(w => w.id === nextMpokeaji);
+
+            const msg = `*MAGERI UCHUMI DAIMA - RECEIPT*\n\n✅ *Malipo Yamethibitishwa*\n\n👤 Mwanachama: ${currentUser.jina}\n📱 Simu: ${currentUser.simu}\n💰 Kiasi: TZS ${db.mipangilio.mchangoKilaMzunguko.toLocaleString()}\n📊 Mzunguko: #${db.mzungukoWaSasa + 1}\n📅 Tarehe: ${new Date().toLocaleDateString()}\n💳 Njia: ${njia}\n🔢 Ref: ${kumbukumbu}\n\n🎯 Mpokeaji wa Mzunguko: ${mpokeaji? mpokeaji.jina : '-'}\n\n_Asante kwa mchango wako!_`;
+
+            tumaWhatsApp(currentUser.simu, msg);
+
+            showToast('Malipo yamethibitishwa! Receipt imetumwa WhatsApp');
+            loadMchangoTab();
+            loadMemberDashboard();
+        }
+
+        function pakuaReceiptMchango(id) {
+            const m = db.michango.find(mc => mc.id === id);
+            if(!m) return;
+
+            const mwanachama = db.wanachama.find(w => w.id === m.mwanachamaId);
+            const mpokeaji = db.wanachama.find(w => w.id === db.mzunguko[m.mzunguko]);
+
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.setTextColor(5, 191, 219);
+            doc.text('MAGERI UCHUMI DAIMA', 105, 20, { align: 'center' });
+
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('RECEIPT YA MCHANGO', 105, 30, { align: 'center' });
+
+            doc.setFontSize(10);
+            doc.text(`Mwanachama: ${mwanachama.jina}`, 20, 50);
+            doc.text(`Simu: ${mwanachama.simu}`, 20, 57);
+            doc.text(`Tarehe: ${new Date(m.tarehe).toLocaleDateString()}`, 20, 64);
+            doc.text(`Mzunguko: #${m.mzunguko + 1}`, 20, 71);
+
+            doc.line(20, 78, 190, 78);
+
+            doc.setFontSize(14);
+            doc.text(`Kiasi Kilicholipwa: TZS ${m.kiasi.toLocaleString()}`, 20, 88);
+            doc.setFontSize(10);
+            doc.text(`Njia ya Malipo: ${m.njia}`, 20, 95);
+            doc.text(`Kumbukumbu: ${m.kumbukumbu}`, 20, 102);
+
+            doc.line(20, 109, 190, 109);
+
+            doc.text(`Mpokeaji wa Mzunguko: ${mpokeaji? mpokeaji.jina : '-'}`, 20, 119);
+
+            doc.setFontSize(8);
+            doc.text('Asante kwa mchango wako!', 105, 280, { align: 'center' });
+
+            doc.save(`Receipt-${mwanachama.jina}-${m.id}.pdf`);
+        }
+        function loadKalendaTab() {
+            const tabContent = document.getElementById('kalenda');
+            tabContent.innerHTML = `
+                <div class="glass p-6 rounded-xl">
+                    <h3 class="font-bold text-xl mb-6">Kalenda ya Mizunguko</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                        ${db.mzunguko.map((mwanachamaId, index) => {
+                            const mwanachama = db.wanachama.find(w => w.id === mwanachamaId);
+                            const isCurrent = index === db.mzungukoWaSasa;
+                            const isPast = index < db.mzungukoWaSasa;
+                            const isMe = mwanachamaId === currentUser.id;
+
+                            return `
+                                <div class="bg-[#011f26] p-4 rounded-lg text-center ${isCurrent? 'border-2 border-[#05bfdb] glow' : ''} ${isPast? 'opacity-50' : ''} ${isMe? 'ring-2 ring-yellow-500' : ''}">
+                                    <p class="text-xs text-gray-400 mb-1">Mzunguko ${index + 1}</p>
+                                    <img src="${mwanachama?.picha || ''}" class="w-12 h-12 rounded-full mx-auto mb-2 border border-[#05bfdb]">
+                                    <p class="font-bold text-sm">${mwanachama? mwanachama.jina.split(' ')[0] : '-'}</p>
+                                    ${isCurrent? '<p class="text-xs text-[#05bfdb] mt-1">ANAPOKEA SASA</p>' : ''}
+                                    ${isPast? '<p class="text-xs text-green-500 mt-1"><i class="fas fa-check"></i> UMEPITA</p>' : ''}
+                                    ${isMe? '<p class="text-xs text-yellow-500 mt-1"><i class="fas fa-star"></i> WEWE</p>' : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // MEETING TAB
+        function loadMeetingTab() {
+            const tabContent = document.getElementById('meeting');
+            const isAdminOrUongozi = isAdmin(currentUser.id) || isUongozi(currentUser.id);
+
+            tabContent.innerHTML = `
+                <div class="glass p-6 rounded-xl">
+                    <h3 class="font-bold text-xl mb-6">Mikutano ya Moja kwa Moja</h3>
+
+                    <div id="liveMeetingStatus" class="mb-6"></div>
+
+                    ${isAdminOrUongozi? `
+                    <div class="bg-[#011f26] p-4 rounded-lg mb-6">
+                        <h4 class="font-bold mb-3">Anzisha Mkutano</h4>
+                        <input type="text" id="meetingTitle" placeholder="Kichwa cha Mkutano" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                        <textarea id="meetingAgenda" placeholder="Agenda ya Mkutano" rows="3" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3"></textarea>
+                        <button onclick="startLiveMeeting()" class="w-full bg-red-600 py-3 rounded-lg font-semibold">
+                            <i class="fas fa-video mr-2"></i>Anza Mkutano LIVE
+                        </button>
+                    </div>
+                    ` : ''}
+
+                    <div class="bg-[#011f26] p-4 rounded-lg">
+                        <h4 class="font-bold mb-3">Mikutano Iliyopita</h4>
+                        <div id="pastMeetingsList" class="space-y-3"></div>
+                    </div>
+                </div>
+            `;
+
+            checkLiveMeetingStatus();
+            loadPastMeetings();
+        }
+
+        function checkLiveMeetingStatus() {
+            const activeMeeting = db.meetings.find(m => m.active);
+            const container = document.getElementById('liveMeetingStatus');
+
+            if(activeMeeting) {
+                liveMeetingActive = true;
+                const mtoa = db.wanachama.find(w => w.id === activeMeeting.hostId);
+
+                container.innerHTML = `
+                    <div class="bg-red-900/20 border-2 border-red-500 p-6 rounded-lg">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-3 h-3 bg-red-500 rounded-full live-pulse"></span>
+                            <span class="font-bold text-red-500">LIVE SASA</span>
+                        </div>
+                        <h4 class="text-xl font-bold mb-2">${activeMeeting.title}</h4>
+                        <p class="text-sm text-gray-300 mb-3">${activeMeeting.agenda}</p>
+                        <p class="text-xs text-gray-400 mb-4"><i class="fas fa-user mr-1"></i>Mwenyeji: ${mtoa? mtoa.jina : 'Admin'}</p>
+                        <button onclick="joinLiveMeeting(${activeMeeting.id})" class="w-full bg-red-600 py-3 rounded-lg font-semibold">
+                            <i class="fas fa-video mr-2"></i>Jiunge na Mkutano
+                        </button>
+                    </div>
+                `;
+
+                document.getElementById('liveIndicator')?.classList.remove('hidden');
+            } else {
+                liveMeetingActive = false;
+                container.innerHTML = `
+                    <div class="bg-[#011f26] p-6 rounded-lg text-center">
+                        <i class="fas fa-video-slash text-4xl text-gray-600 mb-3"></i>
+                        <p class="text-gray-400">Hakuna mkutano wa moja kwa moja sasa</p>
+                    </div>
+                `;
+                document.getElementById('liveIndicator')?.classList.add('hidden');
+            }
+
+            const liveSection = document.getElementById('liveMeetingContainer');
+            if(liveSection) {
+                liveSection.innerHTML = container.innerHTML;
+            }
+        }
+
+        function startLiveMeeting() {
+            const title = document.getElementById('meetingTitle').value.trim();
+            const agenda = document.getElementById('meetingAgenda').value.trim();
+
+            if(!title ||!agenda) return showToast('Jaza kichwa na agenda', 'error');
+
+            db.meetings.forEach(m => m.active = false);
+
+            const meeting = {
+                id: Date.now(),
+                title: title,
+                agenda: agenda,
+                hostId: currentUser.id,
+                startTime: new Date().toISOString(),
+                endTime: null,
+                active: true,
+                participants: [currentUser.id]
+            };
+
+            db.meetings.push(meeting);
+            localStorage.setItem('mageri_meetings', JSON.stringify(db.meetings));
+
+            const msg = `*MAGERI UCHUMI DAIMA*\n\n🔴 *MKUTANO LIVE UMEANZA!*\n\n📋 ${title}\n📝 ${agenda}\n👤 Mwenyeji: ${currentUser.jina}\n\nIngia kwenye app sasa kujiunga!`;
+
+            db.wanachama.forEach(w => {
+                tumaWhatsApp(w.simu, msg);
+            });
+
+            showToast('Mkutano LIVE umeanza! Wote wamejulishwa');
+            checkLiveMeetingStatus();
+            loadMeetingTab();
+        }
+
+        function joinLiveMeeting(id) {
+            const meeting = db.meetings.find(m => m.id === id);
+            if(!meeting ||!meeting.active) return showToast('Mkutano umekwisha', 'error');
+
+            if(!meeting.participants.includes(currentUser.id)) {
+                meeting.participants.push(currentUser.id);
+                localStorage.setItem('mageri_meetings', JSON.stringify(db.meetings));
+            }
+
+            window.open(`https://meet.jit.si/MAGERI-${id}`, '_blank');
+            showToast('Unaingia kwenye mkutano...');
+        }
+
+        function loadPastMeetings() {
+            const container = document.getElementById('pastMeetingsList');
+            if(!container) return;
+
+            const pastMeetings = db.meetings.filter(m =>!m.active).slice(-5).reverse();
+
+            if(pastMeetings.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">Hakuna mikutano iliyopita</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            pastMeetings.forEach(m => {
+                const host = db.wanachama.find(w => w.id === m.hostId);
+                container.innerHTML += `
+                    <div class="bg-[#011f26] p-4 rounded-lg">
+                        <h5 class="font-bold">${m.title}</h5>
+                        <p class="text-xs text-gray-400 mt-1">${new Date(m.startTime).toLocaleDateString()} - ${host? host.jina : 'Admin'}</p>
+                        <p class="text-sm text-gray-300 mt-2">${m.agenda}</p>
+                        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-users mr-1"></i>${m.participants.length} walihudhuria</p>
+                    </div>
+                `;
+            });
+        }
+
+        function loadMatangazoTab() {
+            const tabContent = document.getElementById('matangazo');
+            const isAdminOrUongozi = isAdmin(currentUser.id) || isUongozi(currentUser.id);
+
+            tabContent.innerHTML = `
+                <div class="glass p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-xl">Matangazo ya Kikundi</h3>
+                        ${isAdminOrUongozi? `
+                        <button onclick="showTangazoModal()" class="bg-[#088395] px-4 py-2 rounded-lg">
+                            <i class="fas fa-plus mr-1"></i>Tangazo Jipya
+                        </button>
+                        ` : ''}
+                    </div>
+                    <div id="matangazoListMember" class="space-y-4"></div>
+                </div>
+            `;
+
+            const container = document.getElementById('matangazoListMember');
+            if(db.matangazo.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">Hakuna matangazo bado</p>';
+                return;
+            }
+
+            db.matangazo.slice().reverse().forEach(t => {
+                const mtoa = db.wanachama.find(w => w.id === t.mtoaId);
+                container.innerHTML += `
+                    <div class="bg-[#011f26] p-5 rounded-lg">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-bold text-lg text-[#05bfdb]">${t.title}</h4>
+                            <span class="text-xs text-gray-400">${new Date(t.tarehe).toLocaleDateString()}</span>
+                        </div>
+                        <p class="text-gray-300 mb-3">${t.content}</p>
+                        <p class="text-xs text-gray-500"><i class="fas fa-user mr-1"></i>${mtoa? mtoa.jina : 'System'}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function loadWanachamaTab() {
+            const tabContent = document.getElementById('wanachama');
+            const isAdminUser = isAdmin(currentUser.id);
+
+            tabContent.innerHTML = `
+                <div class="glass p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-xl">Wanachama Wote (${db.wanachama.length})</h3>
+                        ${isAdminUser? `
+                        <button onclick="showAddMemberModal()" class="bg-[#088395] px-4 py-2 rounded-lg">
+                            <i class="fas fa-user-plus mr-1"></i>Ongeza Mwanachama
+                        </button>
+                        ` : ''}
+                    </div>
+                    <input type="text" id="searchWanachamaMember" placeholder="Tafuta mwanachama..." class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-4" onkeyup="searchWanachamaMember()">
+                    <div id="wanachamaListMember" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            `;
+
+            loadWanachamaList();
+        }
+
+        function loadWanachamaList() {
+            const container = document.getElementById('wanachamaListMember');
+            if(!container) return;
+
+            container.innerHTML = '';
+            db.wanachama.forEach(w => {
+                const nafasi = getUongoziTitle(w.id);
+                const mchangoCount = db.michango.filter(m => m.mwanachamaId === w.id).length;
+                const isAdminUser = isAdmin(currentUser.id);
+
+                container.innerHTML += `
+                    <div class="bg-[#011f26] p-4 rounded-lg">
+                        <div class="flex items-center gap-3 mb-3">
+                            <img src="${w.picha}" class="w-16 h-16 rounded-full border-2 border-[#05bfdb]">
+                            <div class="flex-1">
+                                <p class="font-bold">${w.jina}</p>
+                                <p class="text-xs text-gray-400">${w.simu}</p>
+                                <p class="text-xs text-gray-500">${w.mahali}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            ${nafasi? `<span class="text-xs bg-[#088395] px-2 py-1 rounded-full">${nafasi}</span>` : ''}
+                            <span class="text-xs bg-[#0a4d68] px-2 py-1 rounded-full">${mchangoCount} michango</span>
+                        </div>
+                        ${isAdminUser && w.id!== 1? `
+                        <button onclick="removeMember(${w.id})" class="w-full bg-red-600 py-2 rounded-lg text-sm">
+                            <i class="fas fa-user-minus mr-1"></i>Ondoa
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function searchWanachamaMember() {
+            const search = document.getElementById('searchWanachamaMember').value.toLowerCase();
+            const filtered = db.wanachama.filter(w =>
+                w.jina.toLowerCase().includes(search) ||
+                w.simu.includes(search) ||
+                w.mahali.toLowerCase().includes(search)
+            );
+
+            const container = document.getElementById('wanachamaListMember');
+            if(!container) return;
+
+            container.innerHTML = '';
+            filtered.forEach(w => {
+                const nafasi = getUongoziTitle(w.id);
+                const mchangoCount = db.michango.filter(m => m.mwanachamaId === w.id).length;
+                const isAdminUser = isAdmin(currentUser.id);
+
+                container.innerHTML += `
+                    <div class="bg-[#011f26] p-4 rounded-lg">
+                        <div class="flex items-center gap-3 mb-3">
+                            <img src="${w.picha}" class="w-16 h-16 rounded-full border-2 border-[#05bfdb]">
+                            <div class="flex-1">
+                                <p class="font-bold">${w.jina}</p>
+                                <p class="text-xs text-gray-400">${w.simu}</p>
+                                <p class="text-xs text-gray-500">${w.mahali}</p>
+                            </div>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            ${nafasi? `<span class="text-xs bg-[#088395] px-2 py-1 rounded-full">${nafasi}</span>` : ''}
+                            <span class="text-xs bg-[#0a4d68] px-2 py-1 rounded-full">${mchangoCount} michango</span>
+                        </div>
+                        ${isAdminUser && w.id!== 1? `
+                        <button onclick="removeMember(${w.id})" class="w-full bg-red-600 py-2 rounded-lg text-sm">
+                            <i class="fas fa-user-minus mr-1"></i>Ondoa
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        // UONGOZI TAB - ADMIN
+        function loadUongoziTab() {
+            const tabContent = document.getElementById('uongozi');
+            if(!tabContent) return;
+
+            const isAdminUser = isAdmin(currentUser.id);
+
+            tabContent.innerHTML = `
+                <div class="glass p-6 rounded-xl">
+                    <h3 class="font-bold text-xl mb-6">Uongozi wa Kikundi</h3>
+
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        ${Object.keys(db.uongozi).map(nafasi => {
+                            const kiongoziId = db.uongozi[nafasi];
+                            const kiongozi = db.wanachama.find(w => w.id === kiongoziId);
+
+                            return `
+                                <div class="bg-[#011f26] p-4 rounded-lg text-center">
+                                    <i class="fas fa-user-tie text-3xl text-[#05bfdb] mb-3"></i>
+                                    <p class="text-sm text-gray-400 mb-1">${nafasi.charAt(0).toUpperCase() + nafasi.slice(1)}</p>
+                                    ${kiongozi? `
+                                        <img src="${kiongozi.picha}" class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-[#05bfdb]">
+                                        <p class="font-bold">${kiongozi.jina}</p>
+                                        <p class="text-xs text-gray-400">${kiongozi.simu}</p>
+                                    ` : `
+                                        <p class="text-gray-500 text-sm">Hajachaguliwa</p>
+                                    `}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    ${isAdminUser? `
+                    <div class="flex gap-3">
+                        <button onclick="showUongoziModal()" class="flex-1 bg-[#088395] py-3 rounded-lg font-semibold">
+                            <i class="fas fa-user-edit mr-2"></i>Chagua/Badilisha Uongozi
+                        </button>
+                        <button onclick="showEditGroupModal()" class="flex-1 bg-[#0a4d68] py-3 rounded-lg font-semibold">
+                            <i class="fas fa-cog mr-2"></i>Hariri Kikundi
+                        </button>
+                    </div>
+                    ` : ''}
+
+                    <div class="mt-6">
+                        <h4 class="font-bold mb-3">Takwimu za Haraka</h4>
+                        <div class="grid md:grid-cols-4 gap-3">
+                            <div class="bg-[#011f26] p-3 rounded-lg text-center">
+                                <p class="text-2xl font-bold text-[#05bfdb]">${db.wanachama.length}</p>
+                                <p class="text-xs text-gray-400">Wanachama</p>
+                            </div>
+                            <div class="bg-[#011f26] p-3 rounded-lg text-center">
+                                <p class="text-2xl font-bold text-green-500">${db.michango.length}</p>
+                                <p class="text-xs text-gray-400">Michango</p>
+                            </div>
+                            <div class="bg-[#011f26] p-3 rounded-lg text-center">
+                                <p class="text-2xl font-bold text-yellow-500">TZS ${(db.michango.reduce((s,m) => s+m.kiasi, 0)/1000000).toFixed(1)}M</p>
+                                <p class="text-xs text-gray-400">Jumla</p>
+                            </div>
+                            <div class="bg-[#011f26] p-3 rounded-lg text-center">
+                                <p class="text-2xl font-bold text-purple-500">${db.music.length}</p>
+                                <p class="text-xs text-gray-400">Nyimbo</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${isAdminUser? `
+                    <div class="mt-6">
+                        <h4 class="font-bold mb-3">Zana za Admin</h4>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <button onclick="pakuaBackup()" class="bg-indigo-600 p-4 rounded-lg hover:bg-indigo-700 transition">
+                                <i class="fas fa-download text-2xl mb-2"></i>
+                                <p class="font-bold">Pakua Backup</p>
+                                <p class="text-xs text-gray-300">Hifadhi data yote</p>
+                            </button>
+                            <button onclick="document.getElementById('restoreBackupFile').click()" class="bg-orange-600 p-4 rounded-lg hover:bg-orange-700 transition">
+                                <i class="fas fa-upload text-2xl mb-2"></i>
+                                <p class="font-bold">Restore Backup</p>
+                                <p class="text-xs text-gray-300">Rudisha data</p>
+                            </button>
+                            <input type="file" id="restoreBackupFile" accept=".json" class="hidden" onchange="pandishaBackup(event)">
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function showUongoziModal() {
+            const modal = document.getElementById('uongoziModal');
+            const container = document.getElementById('uongoziSelection');
+
+            container.innerHTML = '';
+
+            Object.keys(db.uongozi).forEach(nafasi => {
+                const currentId = db.uongozi[nafasi];
+
+                container.innerHTML += `
+                    <div class="bg-[#011f26] p-4 rounded-lg">
+                        <h4 class="font-bold mb-3">${nafasi.charAt(0).toUpperCase() + nafasi.slice(1)}</h4>
+                        <select id="select_${nafasi}" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3">
+                            <option value="">Chagua Mwanachama</option>
+                            ${db.wanachama.map(w => `
+                                <option value="${w.id}" ${w.id === currentId? 'selected' : ''}>${w.jina} - ${w.simu}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+            });
+
+            container.innerHTML += `
+                <button onclick="hifadhiUongozi()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold mt-4">
+                    <i class="fas fa-save mr-2"></i>Hifadhi Uongozi
+                </button>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeUongoziModal() {
+            document.getElementById('uongoziModal').classList.remove('active');
+        }
+
+        function hifadhiUongozi() {
+            Object.keys(db.uongozi).forEach(nafasi => {
+                const selectId = document.getElementById(`select_${nafasi}`).value;
+                db.uongozi[nafasi] = selectId? parseInt(selectId) : null;
+            });
+
+            localStorage.setItem('mageri_uongozi', JSON.stringify(db.uongozi));
+            closeUongoziModal();
+            loadUongoziTab();
+            showToast('Uongozi umehifadhiwa!');
+        }
+        // MUSIC ADMIN TAB
+        function loadMusicAdminTab() {
+            const tabContent = document.getElementById('musicAdmin');
+            if (!tabContent) return;
+            
+            // STORAGE CHECK
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length * 2;
+                }
+            }
+            const mb = (total / 1024 / 1024).toFixed(2);
+            
+            tabContent.innerHTML = `
+                <div class="glass p-6 rounded-xl">
+                    <h3 class="font-bold text-xl mb-6"><i class="fas fa-music mr-2"></i>Simamia Muziki wa Kikundi</h3>
+
+                    <div class="bg-yellow-900/20 border border-yellow-600 p-3 rounded-lg mb-6 text-xs">
+                        <p><i class="fas fa-info-circle mr-1"></i>Storage: ${mb}MB / 5MB</p>
+                        ${mb > 4? '<p class="text-red-400 mt-1">⚠️ Storage karibu kujaa! Futa muziki wa zamani.</p>' : ''}
+                    </div>
+
+                    <div class="bg-[#011f26] p-6 rounded-lg mb-6">
+                        <h4 class="font-bold mb-4">Pandisha Muziki Mpya</h4>
+                        <input type="text" id="musicTitleAdmin" placeholder="Jina la Wimbo" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                        <input type="text" id="musicArtistAdmin" placeholder="Jina la Msanii" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-3">
+                        <input type="file" id="musicFileAdmin" accept="audio/*" class="w-full bg-[#011f26] border border-[#0a4d68] rounded-lg p-3 mb-2">
+                        <p class="text-xs text-gray-400 mb-4">Max: 2MB - MP3, WAV, M4A. Compress kwanza!</p>
+                        <button onclick="uploadMusicAdmin()" class="w-full bg-[#088395] py-3 rounded-lg font-semibold hover:bg-[#05bfdb] hover:text-[#011f26] transition">
+                            <i class="fas fa-upload mr-2"></i>Pandisha Muziki
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold">Orodha ya Nyimbo (${db.music.length})</h4>
+                        <button onclick="clearMusicStorage()" class="bg-red-600 px-4 py-2 rounded-lg text-sm">
+                            <i class="fas fa-trash mr-1"></i>Futa Zote
+                        </button>
+                    </div>
+
+                    <div id="musicListAdmin" class="space-y-3">
+                        ${db.music.length === 0? `
+                            <div class="text-center py-8">
+                                <i class="fas fa-music text-6xl text-gray-600 mb-4"></i>
+                                <p class="text-gray-400">Hakuna muziki bado</p>
+                            </div>
+                        ` : db.music.map((song, index) => {
+                            const uploader = db.wanachama.find(w => w.id === song.uploadedBy);
+                            return `
+                                <div class="bg-[#011f26] p-4 rounded-lg flex items-center justify-between hover:bg-[#0a4d68] transition">
+                                    <div class="flex items-center gap-3 flex-1">
+                                        <div class="bg-[#088395] w-12 h-12 rounded-lg flex items-center justify-center">
+                                            <span class="font-bold">${index + 1}</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-bold">${song.title}</p>
+                                            <p class="text-xs text-gray-400">${song.artist} • ${uploader?.jina || 'Admin'}</p>
+                                            <p class="text-xs text-gray-500">${(song.fileSize/1024/1024).toFixed(2)}MB • ${new Date(song.uploadDate).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="playMusicPreview(${index})" class="bg-green-600 px-4 py-2 rounded-lg">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <button onclick="deleteMusic(${song.id})" class="bg-red-600 px-3 py-2 rounded-lg">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <audio id="musicPreviewPlayer" controls class="w-full mt-4" style="display: none;"></audio>
+                </div>
+            `;
+        }
+        
+        function uploadMusicAdmin() {
+            const title = document.getElementById('musicTitleAdmin').value.trim();
+            const artist = document.getElementById('musicArtistAdmin').value.trim();
+            const fileInput = document.getElementById('musicFileAdmin');
+            
+            if (!title || !artist) return showToast('Jaza jina la wimbo na msanii', 'error');
+            if (!fileInput.files || !fileInput.files[0]) return showToast('Chagua file ya muziki', 'error');
+            
+            const file = fileInput.files[0];
+            
+            if (file.size > 2 * 1024 * 1024) {
+                return showToast('File kubwa! Tumia MP3 chini ya 2MB. Compress kwanza', 'error');
+            }
+            
+            if (!file.type.startsWith('audio/')) {
+                return showToast('Chagua MP3/WAV/M4A tu', 'error');
+            }
+            
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length * 2;
+                }
+            }
+            const mb = (total / 1024 / 1024).toFixed(2);
+            if (mb > 4) {
+                return showToast('⚠️ Storage imejaa! Futa muziki wa zamani kwanza', 'error');
+            }
+            
+            showToast('⏳ Inapandisha...');
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const music = {
+                        id: Date.now(),
+                        title: title,
+                        artist: artist,
+                        data: e.target.result,
+                        fileName: file.name,
+                        fileSize: file.size,
+                        uploadedBy: currentUser.id,
+                        uploadDate: new Date().toISOString()
+                    };
+                    
+                    db.music.push(music);
+                    
+                    try {
+                        localStorage.setItem('mageri_music', JSON.stringify(db.music));
+                    } catch (storageErr) {
+                        db.music.pop();
+                        return showToast('❌ Storage imejaa! Futa muziki wa zamani', 'error');
+                    }
+                    
+                    const message = `*MAGERI UCHUMI DAIMA*\n\n🎵 *Muziki Mpya!*\n\n🎤 ${title}\n👤 ${artist}\n📁 ${(file.size/1024/1024).toFixed(2)}MB\n\nIngia kwenye app kusikiliza!\n\n_Imeongezwa na: ${currentUser.jina}_`;
+                    
+                    db.wanachama.forEach(w => {
+                        tumaWhatsApp(w.simu, message);
+                    });
+                    
+                    document.getElementById('musicTitleAdmin').value = '';
+                    document.getElementById('musicArtistAdmin').value = '';
+                    document.getElementById('musicFileAdmin').value = '';
+                    
+                    loadMusicAdminTab();
+                    loadMusicPage();
+                    showToast('✅ Muziki umepandishwa!');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Imeshindwa kuhifadhi', 'error');
+                }
+            };
+            
+            reader.onerror = function() {
+                showToast('Imeshindwa kusoma file', 'error');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function playMusicPreview(index) {
+            const song = db.music[index];
+            if (!song) return;
+            
+            const player = document.getElementById('musicPreviewPlayer');
+            player.src = song.data;
+            player.style.display = 'block';
+            player.play();
+            showToast(`🎵 Inacheza: ${song.title}`);
+        }
+
+        // BACKUP SYSTEM
+        function pakuaBackup() {
+            if(!isAdmin(currentUser.id)) return showToast('Admin tu', 'error');
+
+            const backup = {
+                version: '1.0',
+                date: new Date().toISOString(),
+                data: db
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MAGERI-Backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            showToast('✅ Backup imedownload');
+        }
+
+        function pandishaBackup(event) {
+            if(!isAdmin(currentUser.id)) return showToast('Admin tu', 'error');
+
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    if(confirm('Una uhakika unataka kurestore backup? Data ya sasa itafutwa!')) {
+                        db = backup.data;
+                        localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
+                        localStorage.setItem('mageri_michango', JSON.stringify(db.michango));
+                        localStorage.setItem('mageri_mzunguko', JSON.stringify(db.mzunguko));
+                        localStorage.setItem('mageri_uongozi', JSON.stringify(db.uongozi));
+                        localStorage.setItem('mageri_matangazo', JSON.stringify(db.matangazo));
+                        localStorage.setItem('mageri_meetings', JSON.stringify(db.meetings));
+                        localStorage.setItem('mageri_music', JSON.stringify(db.music));
+                        localStorage.setItem('mageri_kura', JSON.stringify(db.kura));
+                        localStorage.setItem('mageri_mipangilio', JSON.stringify(db.mipangilio));
+                        localStorage.setItem('mageri_mzunguko_sasa', db.mzungukoWaSasa);
+
+                        showToast('✅ Backup imerestore! Inareload...');
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } catch(err) {
+                    showToast('Backup file si sahihi', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // MODAL FUNCTIONS
+        function showTangazoModal() { document.getElementById('tangazoModal').classList.add('active'); }
+        function closeTangazoModal() { document.getElementById('tangazoModal').classList.remove('active'); }
+
+        function ongezaTangazo() {
+            const title = document.getElementById('tangazoTitle').value.trim();
+            const content = document.getElementById('tangazoContent').value.trim();
+
+            if(!title ||!content) return showToast('Jaza sehemu zote', 'error');
+
+            const tangazo = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                mtoaId: currentUser.id,
+                tarehe: new Date().toISOString()
+            };
+
+            db.matangazo.push(tangazo);
+            localStorage.setItem('mageri_matangazo', JSON.stringify(db.matangazo));
+
+            const msg = `*MAGERI UCHUMI DAIMA*\n\n📢 *Tangazo Jipya*\n\n*${title}*\n\n${content}\n\n_Imechapishwa na: ${currentUser.jina}_`;
+
+            db.wanachama.forEach(w => {
+                tumaWhatsApp(w.simu, msg);
+            });
+
+            closeTangazoModal();
+            loadMatangazo();
+            showToast('Tangazo limechapishwa!');
+        }
+
+        function showEditProfileModal() {
+            document.getElementById('editJina').value = currentUser.jina;
+            document.getElementById('editSimu').value = currentUser.simu;
+            document.getElementById('editDob').value = currentUser.dob || '';
+            document.getElementById('editJinsia').value = currentUser.jinsia || '';
+            document.getElementById('editMahali').value = currentUser.mahali || '';
+            document.getElementById('editPreviewPicha').src = currentUser.picha;
+            document.getElementById('editProfileModal').classList.add('active');
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').classList.remove('active');
+        }
+
+        document.getElementById('editPicha')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    document.getElementById('editPreviewPicha').src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function hifadhiProfile() {
+            const jina = document.getElementById('editJina').value.trim();
+            const simu = document.getElementById('editSimu').value.trim();
+            const dob = document.getElementById('editDob').value;
+            const jinsia = document.getElementById('editJinsia').value;
+            const mahali = document.getElementById('editMahali').value.trim();
+            const pichaFile = document.getElementById('editPicha').files[0];
+
+            if(!jina ||!simu) return showToast('Jaza jina na simu', 'error');
+
+            const processUpdate = (newPicha) => {
+                const index = db.wanachama.findIndex(w => w.id === currentUser.id);
+                if(index!== -1) {
+                    db.wanachama[index].jina = jina;
+                    db.wanachama[index].simu = simu;
+                    db.wanachama[index].dob = dob;
+                    db.wanachama[index].jinsia = jinsia;
+                    db.wanachama[index].mahali = mahali;
+                    if(newPicha) db.wanachama[index].picha = newPicha;
+
+                    currentUser = db.wanachama[index];
+                    localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
+                    localStorage.setItem('mageri_current_user', JSON.stringify(currentUser));
+
+                    closeEditProfileModal();
+                    loadMemberDashboard();
+                    updateNavStatus();
+                    showToast('Profile imehifadhiwa!');
+                }
+            };
+
+            if(pichaFile) {
+                const reader = new FileReader();
+                reader.onload = e => processUpdate(e.target.result);
+                reader.readAsDataURL(pichaFile);
+            } else {
+                processUpdate(null);
+            }
+        }
+
+        function showAddMemberModal() { document.getElementById('addMemberModal').classList.add('active'); }
+        function closeAddMemberModal() { document.getElementById('addMemberModal').classList.remove('active'); }
+
+        function ongezaMwanachamaAdmin() {
+            const jina = document.getElementById('addJina').value.trim();
+            const simu = document.getElementById('addSimu').value.trim();
+            const password = document.getElementById('addPassword').value;
+
+            if(!jina ||!simu ||!password) return showToast('Jaza sehemu zote', 'error');
+            if(db.wanachama.find(w => w.simu === simu)) return showToast('Namba hii imeshasajiliwa', 'error');
+
+            const newId = db.wanachama.length > 0? Math.max(...db.wanachama.map(w => w.id)) + 1 : 1;
+            const newMember = {
+                id: newId,
+                jina: jina,
+                simu: simu,
+                password: password,
+                picha: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(jina) + '&background=05bfdb&color=011f26',
+                dob: '',
+                jinsia: '',
+                mahali: '',
+                tareheKujiunga: new Date().toISOString()
+            };
+
+            db.wanachama.push(newMember);
+            db.mzunguko.push(newId);
+            localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
+            localStorage.setItem('mageri_mzunguko', JSON.stringify(db.mzunguko));
+
+            const msg = `*MAGERI UCHUMI DAIMA*\n\nHongera ${jina}!\n\nUmeongezwa na Admin kwenye kikundi cha MAGERI.\n\n📱 Namba yako: ${simu}\n🔑 Neno la siri: ${password}\n\nKaribu!`;
+
+            tumaWhatsApp(simu, msg);
+
+            closeAddMemberModal();
+            loadWanachamaList();
+            showToast('Mwanachama ameongezwa!');
+        }
+
+        function removeMember(id) {
+            if(!confirm('Una uhakika unataka kumwondoa mwanachama huyu?')) return;
+
+            db.wanachama = db.wanachama.filter(w => w.id!== id);
+            db.mzunguko = db.mzunguko.filter(mId => mId!== id);
+            db.michango = db.michango.filter(m => m.mwanachamaId!== id);
+
+            Object.keys(db.uongozi).forEach(nafasi => {
+                if(db.uongozi[nafasi] === id) db.uongozi[nafasi] = null;
+            });
+
+            localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
+            localStorage.setItem('mageri_mzunguko', JSON.stringify(db.mzunguko));
+            localStorage.setItem('mageri_michango', JSON.stringify(db.michango));
+            localStorage.setItem('mageri_uongozi', JSON.stringify(db.uongozi));
+
+            loadWanachamaList();
+            showToast('Mwanachama ameondolewa');
+        }
+
+        function showEditGroupModal() { document.getElementById('editGroupModal').classList.add('active'); }
+        function closeEditGroupModal() { document.getElementById('editGroupModal').classList.remove('active'); }
+
+        document.getElementById('editGroupLogoFile')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    document.getElementById('editGroupLogo').src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function hifadhiGroupProfile() {
+            const jina = document.getElementById('editGroupName').value.trim();
+            const logoFile = document.getElementById('editGroupLogoFile').files[0];
+
+            if(!jina) return showToast('Jaza jina la kikundi', 'error');
+
+            const processUpdate = (newLogo) => {
+                db.mipangilio.jina = jina;
+                if(newLogo) db.mipangilio.groupLogo = newLogo;
+
+                localStorage.setItem('mageri_mipangilio', JSON.stringify(db.mipangilio));
+                loadGroupProfile();
+                closeEditGroupModal();
+                showToast('Profile ya kikundi imehifadhiwa!');
+            };
+
+            if(logoFile) {
+                const reader = new FileReader();
+                reader.onload = e => processUpdate(e.target.result);
+                reader.readAsDataURL(logoFile);
+            } else {
+                processUpdate(null);
+            }
+        }
+
+        function fungaReceipt() { document.getElementById('receiptModal').classList.remove('active'); }
+        function pakuaReceiptPDF() { showToast('Pakua kutoka kwenye tab ya Mchango', 'error'); }
+
+        // INIT
+        window.onload = () => {
+            loadGroupProfile();
+            loadHomePage();
+            checkUserSession();
+            checkLiveMeetingStatus();
+            setInterval(checkLiveMeetingStatus, 5000);
+        };
+    </script>
+<script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('PWA: Service Worker registered'))
+                .catch(err => console.log('PWA: Failed', err));
+        });
+    }
+    
+    // Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Onyesha button ya "Install App"
+        showInstallButton();
+    });
+    
+    function showInstallButton() {
+        // Tutaweka button kwenye Settings
+        const installBtn = `
+    <button onclick="installApp()" class="w-full bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4 rounded-xl font-bold mb-3">
+      <i class="fas fa-download mr-2"></i>Weka MAGERI Kwenye Simu
+    </button>
+<!-- Install PWA Button -->
+<div id="installAppContainer"></div>
+  `;
+        // Itaongezwa kwenye settings tab
+    }
+function checkInstallPrompt() {
+    setTimeout(() => {
+        if (deferredPrompt) {
+            document.getElementById('installAppContainer').innerHTML = `
+        <button onclick="installApp()" class="w-full bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4 rounded-xl font-bold mb-3 flex items-center justify-center">
+          <i class="fas fa-download mr-2"></i>Weka MAGERI Kwenye Simu Yako
+        </button>
+      `;
+        }
+    }, 1000);
+}
+
+// Ita function hii mwisho wa showSettingsPage()
+checkInstallPrompt();
+    
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    showToast('✅ App imewekwa! Angalia home screen');
+                }
+                deferredPrompt = null;
+            });
+        }
+    }
+</script>
+</body>
+</html>
