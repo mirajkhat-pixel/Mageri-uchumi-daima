@@ -80,6 +80,19 @@
     <button id="enableNotificationsBtn" onclick="requestNotificationPermission()" 
             style="background: #FF6B35; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold;">
         🔔 Washa Arifa
+        <button onclick="getMyToken()" style="background:green;color:white;padding:10px;margin:10px;">
+  📱 Nipe Token Yangu
+</button>
+
+<script>
+function getMyToken() {
+  messaging.getToken({vapidKey: VAPID_PUBLIC_KEY}).then(token => {
+    navigator.clipboard.writeText(token);
+    alert('Token imecopiwa! Nenda Firebase u-paste');
+    console.log(token);
+  });
+}
+</script>
     </button>
     <p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
 </div>
