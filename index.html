@@ -7,7 +7,8 @@
 <head>
     <meta charset="UTF-8">
     <title>MAGERI Uchumi Daima</title>
-    
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
     <!-- WEKA HIZI 5 HAPA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#f39c12">
@@ -75,6 +76,13 @@
             <div class="flex items-center gap-3">
                 <img id="groupLogo" src="https://ui-avatars.com/api/?name=MAGERI&background=05bfdb&color=011f26&bold=true" class="w-12 h-12 rounded-full border-2 border-[#05bfdb]">
                 <div>
+                    <div id="notificationSection" style="margin: 15px 0; text-align: center;">
+    <button id="enableNotificationsBtn" onclick="requestNotificationPermission()" 
+            style="background: #FF6B35; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold;">
+        🔔 Washa Arifa
+    </button>
+    <p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
+</div>
                     <h1 id="groupName" class="text-xl font-bold text-[#05bfdb]">MAGERI UCHUMI DAIMA</h1>
                     <p class="text-xs text-gray-400">Tunaokoleana Kiuchumi</p>
                 </div>
@@ -2440,6 +2448,58 @@ const firebaseConfig = {
     messagingSenderId: "670762770974",
     appId:"1:670762770974:web:32b326c8c6ef0a273f040f"
 };
+      // MAGERI V4 - FIREBASE MESSAGING SETUP
+let messaging;
+
+function initFirebaseMessaging() {
+    try {
+        firebase.initializeApp(firebaseConfig);
+        messaging = firebase.messaging();
+        
+        // Angalia kama tayari ana token
+        messaging.getToken({ vapidKey: VAPID_PUBLIC_KEY }).then((currentToken) => {
+            if (currentToken) {
+                document.getElementById('enableNotificationsBtn').innerText = '✅ Arifa Zimewashwa';
+                document.getElementById('enableNotificationsBtn').disabled = true;
+                document.getElementById('notifStatus').innerText = 'Utapokea taarifa mpya';
+                console.log('FCM Token:', currentToken);
+            }
+        }).catch((err) => {
+            console.log('Token error:', err);
+        });
+    } catch(e) { 
+        console.log('Firebase error', e); 
+    }
+}
+
+function requestNotificationPermission() {
+    Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+            messaging.getToken({ vapidKey: VAPID_PUBLIC_KEY }).then((currentToken) => {
+                if (currentToken) {
+                    document.getElementById('enableNotificationsBtn').innerText = '✅ Arifa Zimewashwa';
+                    document.getElementById('enableNotificationsBtn').disabled = true;
+                    document.getElementById('notifStatus').innerText = 'Umefanikiwa kuwasha arifa';
+                    alert('Arifa zimewashwa! Utapokea taarifa za mikopo na vikao.');
+                } else {
+                    alert('Imeshindikana kupata token. Jaribu tena.');
+                }
+            });
+        } else {
+            alert('Umekataa ruhusa. Nenda Settings > Site Settings > Notifications > Allow');
+        }
+    });
+}
+
+// Anzisha baada ya page kuload
+window.addEventListener('load', () => { 
+    setTimeout(initFirebaseMessaging, 2000); 
+});
+
+// Sajili service worker
+if ('serviceWorker' in navigator) { 
+    navigator.serviceWorker.register('./firebase-messaging-sw.js'); 
+}
   </script>
 </body>
 </html>
