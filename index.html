@@ -83,35 +83,58 @@
         <button id="getTokenBtn" onclick="pataToken()" style="background:#16a34a;color:white;padding:12px;margin:10px auto;display:block;border-radius:8px;border:none;font-weight:bold;width:90%;">
   📱 Pata FCM Token Yangu
 </button>
+<button id="getTokenBtn" onclick="pataToken()" style="background:#16a34a;color:white;padding:12px;margin:10px auto;display:block;border-radius:8px;border:none;font-weight:bold;width:90%;">
+  📱 Pata FCM Token Yangu
+</button>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 <script>
 async function pataToken() {
   try {
-    // 1. Angalia ruhusa kwanza
+    // 1. Initialize Firebase ndani ya function
+    const firebaseConfig = {
+      apiKey: "AIzaSyDW4d-NOM0v5O1vJhgDg5pv3J5ENHrX0mE",
+      authDomain: "mageri-uchumi-daima.firebaseapp.com",
+      projectId: "mageri-uchumi-daima",
+      storageBucket: "mageri-uchumi-daima.firebasestorage.app",
+      messagingSenderId: "670762770974",
+      appId: "1:670762770974:web:9df1ee18dcba8f6420f9e7"
+    };
+    
+    // Angalia kama app haipo, anzisha
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    const messaging = firebase.messaging();
+
+    // 2. Omba ruhusa
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       alert('❌ Kwanza bonyeza ALLOW kwenye arifa');
       return;
     }
 
-    // 2. Pata token
+    // 3. Pata token
+    const VAPID_PUBLIC_KEY = 'BFl3qDd3AY93Yv2gUDLXZebZEimsLw7yZ4_YsBIvO5eFYO2Krt0VMrjK6vdglPBvwU-lOCIZjaqLaNd5g_yk5IU';
     const token = await messaging.getToken({vapidKey: VAPID_PUBLIC_KEY});
     
     if (token) {
-      // 3. Copy na onyesha
       await navigator.clipboard.writeText(token);
       alert('✅ TOKEN IMECOPIWA!\n\nNenda Firebase → Paste → Test');
       console.log('FCM TOKEN:', token);
-      prompt('Copy Token Hii:', token); // Backup kama copy imefail
+      prompt('Copy Token Hii:', token);
     } else {
-      alert('❌ Hakuna token. Jaribu ku-refresh page');
+      alert('❌ Hakuna token. Hakikisha ume-allow arifa');
     }
   } catch (error) {
-    alert('ERROR: ' + error.message + '\n\nJaribu ku-refresh MAGERI kwanza');
+    alert('ERROR: ' + error.message);
     console.log('Error:', error);
   }
 }
 </script>
+
     </button>
     <p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
 </div>
