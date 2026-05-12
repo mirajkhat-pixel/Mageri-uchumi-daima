@@ -64,6 +64,66 @@
         .admin-tab:hover { background: #088395; }
         .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .animate-pulse { animation: pulse 1.5s infinite; }
+ /* LOGO YA MAGERI GRADIENT KALI */
+.mageri-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  animation: spin-glow 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.6));
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.mageri-gradient {
+  font-size: 1.8rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #FF6B00 0%, #FFA500 25%, #FFD700 50%, #22C55E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 20px rgba(255, 107, 0, 0.3);
+}
+
+.tagline {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6B7280;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Animation logo inazunguka + inang'aa */
+@keyframes spin-glow {
+  0%, 100% { 
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.6));
+  }
+  50% { 
+    transform: rotate(10deg) scale(1.1);
+    filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.9));
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .tagline {
+    color: #9CA3AF;
+  }
+  .mageri-gradient {
+    text-shadow: 0 2px 30px rgba(255, 165, 0, 0.5);
+  }
+}  
     </style>
 </head>
 <body>
