@@ -4,20 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAGERI UCHUMI DAIMA</title>
-<head>
-    <meta charset="UTF-8">
-    <title>MAGERI Uchumi Daima</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-    <!-- WEKA HIZI 5 HAPA -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#f39c12">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    
-    <!-- zilizopo zingine ziachi... -->
-</head>
 <!-- PWA Meta Tags -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#0d9488">
@@ -144,64 +130,6 @@
     <span class="tagline">UCHUMI DAIMA</span>
   </div>
 </div> 
-                    <div id="notificationSection" style="margin: 15px 0; text-align: center;">
-    <button id="enableNotificationsBtn" onclick="requestNotificationPermission()" 
-            style="background: #FF6B35; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold;">
-        🔔 Washa Arifa
-<button id="getTokenBtn" onclick="pataToken()" style="background:#16a34a;color:white;padding:12px;margin:10px auto;display:block;border-radius:8px;border:none;font-weight:bold;width:90%;">
-  📱 Pata FCM Token Yangu
-</button>
-
-<!-- ANZA KUBANDIKA HAPA 👇 -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-
-<script>
-async function pataToken() {
-  try {
-    const firebaseConfig = {
-  apiKey: "AIzaSyAx1Tg2V-OSBfUAvw5-LxL-iyyWb5pbcRQ",
-  authDomain: "mageri-uchumi-daima.firebaseapp.com",
-  projectId: "mageri-uchumi-daima",
-  storageBucket: "mageri-uchumi-daima.firebasestorage.app",
-  messagingSenderId: "670762770974",
-  appId: "1:670762770974:web:32b326c8c6ef0a273f040f"
-};
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    
-    const messaging = firebase.messaging();
-
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      alert('❌ Kwanza bonyeza ALLOW kwenye arifa');
-      return;
-    }
-
-    const swRegistration = await navigator.serviceWorker.register('/Mageri-uchumi-daima/firebase-messaging-sw.js');
-    const VAPID_PUBLIC_KEY = 'BFl3qDd3AY93Yv2gUDLXZebZEimsLw7yZ4_YsBIvO5eFYO2Krt0VMrjK6vdglPBvwU-lOCIZjaqLaNd5g_yk5IU';
-    const token = await messaging.getToken({
-      vapidKey: VAPID_PUBLIC_KEY,
-      serviceWorkerRegistration: swRegistration
-    });
-    
-    if (token) {
-      await navigator.clipboard.writeText(token);
-      alert('✅ TOKEN IMECOPIWA!\n\nNenda Firebase → Paste → Test');
-      console.log('FCM TOKEN:', token);
-      prompt('Copy Token Hii:', token);
-    } else {
-      alert('❌ Hakuna token. Hakikisha ume-allow arifa');
-    }
-  } catch (error) {
-    alert('ERROR: ' + error.message);
-    console.log('Error:', error);
-  }
-}
-</script>
-<!-- ISHA HAPA 👆 -->
-    </button>
     <p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
 </div>
                     <h1 id="groupName" class="text-xl font-bold text-[#05bfdb]">MAGERI UCHUMI DAIMA</h1>
@@ -2554,72 +2482,6 @@ checkInstallPrompt();
         });
       });
     }
-
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
-    });
-    const VAPID_PUBLIC_KEY = "BC3ghf94OKBrAdXRKiTiunM3zV4hbieJSB5wmVQwfgmhBgE4CHv91b9JXd-3943GJy8sRDAFcHPFRr2A2XfsLes";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAx1Tg2V-OSBfUAvw5-LxL-iyyWb5pbcRQ",
-  authDomain: "mageri-uchumi-daima.firebaseapp.com",
-  projectId: "mageri-uchumi-daima",
-  storageBucket: "mageri-uchumi-daima.firebasestorage.app",
-  messagingSenderId: "670762770974",
-  appId: "1:670762770974:web:32b326c8c6ef0a273f040f"
-};
-      // MAGERI V4 - FIREBASE MESSAGING SETUP
-let messaging;
-
-function initFirebaseMessaging() {
-    try {
-        firebase.initializeApp(firebaseConfig);
-        messaging = firebase.messaging();
-        
-        // Angalia kama tayari ana token
-        messaging.getToken({ vapidKey: VAPID_PUBLIC_KEY }).then((currentToken) => {
-            if (currentToken) {
-                document.getElementById('enableNotificationsBtn').innerText = '✅ Arifa Zimewashwa';
-                document.getElementById('enableNotificationsBtn').disabled = true;
-                document.getElementById('notifStatus').innerText = 'Utapokea taarifa mpya';
-                console.log('FCM Token:', currentToken);
-            }
-        }).catch((err) => {
-            console.log('Token error:', err);
-        });
-    } catch(e) { 
-        console.log('Firebase error', e); 
-    }
-}
-
-function requestNotificationPermission() {
-    Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-            messaging.getToken({ vapidKey: VAPID_PUBLIC_KEY }).then((currentToken) => {
-                if (currentToken) {
-                    document.getElementById('enableNotificationsBtn').innerText = '✅ Arifa Zimewashwa';
-                    document.getElementById('enableNotificationsBtn').disabled = true;
-                    document.getElementById('notifStatus').innerText = 'Umefanikiwa kuwasha arifa';
-                    alert('Arifa zimewashwa! Utapokea taarifa za mikopo na vikao.');
-                } else {
-                    alert('Imeshindikana kupata token. Jaribu tena.');
-                }
-            });
-        } else {
-            alert('Umekataa ruhusa. Nenda Settings > Site Settings > Notifications > Allow');
-        }
-    });
-}
-
-// Anzisha baada ya page kuload
-window.addEventListener('load', () => { 
-    setTimeout(initFirebaseMessaging, 2000); 
-});
-
-// Sajili service worker
-if ('serviceWorker' in navigator) { 
-    navigator.serviceWorker.register('./firebase-messaging-sw.js'); 
-}
   </script>
 </body>
 </html>
