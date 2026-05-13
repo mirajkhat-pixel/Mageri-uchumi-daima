@@ -489,23 +489,23 @@ if ('serviceWorker' in navigator) {
             document.body.classList.add('light-mode');
         }
         
-        // INIT ADMIN
-        if (!db.wanachama.find(w => w.simu === '0780000000')) {
-            db.wanachama.push({
-                id: 1,
-                jina: 'Admin MAGERI',
-                simu: '0780000000',
-                password: 'admin123',
-                picha: 'https://ui-avatars.com/api/?name=Admin&background=05bfdb&color=011f26',
-                dob: '1990-01-01',
-                jinsia: 'Mwanaume',
-                mahali: 'Dar es Salaam',
-                tareheKujiunga: new Date().toISOString()
-            });
-            db.mzunguko.push(1);
-            localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
-            localStorage.setItem('mageri_mzunguko', JSON.stringify(db.mzunguko));
-        }
+       // INIT ADMIN
+if (!db.wanachama.find(w => w.simu === '+255765534400')) {
+  db.wanachama.push({
+    id: 1,
+    jina: 'Developer',
+    simu: '+255765534400',
+    password: 'developer123',
+    picha: 'https://ui-avatars.com/api/?name=Developer&background=0D8ABC',
+    dob: '1990-01-01',
+    jinsia: 'Mwanaume',
+    mahali: 'Dar es Salaam',
+    tareheKujiunga: new Date().toISOString()
+  });
+  db.mzunguko.push(1);
+  localStorage.setItem('mageri_wanachama', JSON.stringify(db.wanachama));
+  localStorage.setItem('mageri_mzunguko', JSON.stringify(db.mzunguko));
+} 
         
         // UTILITY FUNCTIONS
         function showToast(msg, type = 'success') {
