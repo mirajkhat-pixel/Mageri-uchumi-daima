@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAGERI UCHUMI DAIMA</title>
+<head>
+    <meta charset="UTF-8">
+    <title>MAGERI Uchumi Daima</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+    <!-- WEKA HIZI 5 HAPA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#f39c12">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- zilizopo zingine ziachi... -->
+</head>
 <!-- PWA Meta Tags -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#0d9488">
@@ -105,92 +119,49 @@
 @media (prefers-color-scheme: dark) {
   .tagline {
     color: #9CA3AF;
-  }  
-    mageri-gradient {    text-shadow: 0 2px 30px rgba(255, 1  }  
-}
-      .mageri-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-}
-
-.mageri-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.mageri-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.mageri-gradient {
-  background: linear-gradient(90deg, #ff8c00, #ffa500, #ffd700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 1.4rem;
-  font-weight: 800;
-}
-
-.tagline {
-  font-size: 0.8rem;
-  color: #9CA3AF;
-  font-weight: 500;
-  margin-left: 2px;
-        }
-                                   }
-
-.nav-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 12px;
-}
-        .nav-actions {
-  margin-right: auto;
-}
-
-.mageri-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-  </style>
+  }
+  .mageri-gradient {
+    text-shadow: 0 2px 30px rgba(255, 165, 0, 0.5);
+  }
+}  
+    </style>
 </head>
 <body>
     <!-- TOAST NOTIFICATION -->
     <div id="toastContainer"></div>
 
     <!-- NAVIGATION -->
-    <nav class="glass sticky top-0 z-50 p-4 mageri-header">
-        <div class="max-w-7xl mx-auto flex items-center w-full">
-    <!-- Logo kushoto -->
-    <div class="mageri-logo">
-      <div class="mageri-icon">🍊</div>
-      <div class="logo-text">
-        <span class="mageri-gradient">MAGERI</span>
-        <span class="tagline">UCHUMI DAIMA</span>
-      </div>
-    </div>
-
-    <!-- Buttons kulia -->
-    <div class="flex items-center gap-3 nav-actions">
-      <button onclick="toggleTheme()" id="themeBtn">
-        <i class="fas fa-moon"></i>
-      </button>
-      <button id="loginBtnNav" onclick="showLoginModal()">
-        <i class="fas fa-sign-in-alt mr-1"></i>Ingia
-      </button>
-    </div>
-    
+    <nav class="glass sticky top-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img id="groupLogo" src="https://ui-avatars.com/api/?name=MAGERI&background=05bfdb&color=011f26&bold=true" class="w-12 h-12 rounded-full border-2 border-[#05bfdb]">
+                <div>
+                   <!-- LOGO MPYA YA MAGERI -->
+<div class="mageri-logo">
+  <div class="logo-icon">🍊</div>
+  <div class="logo-text">
+    <span class="mageri-gradient">MAGERI</span>
+    <span class="tagline">UCHUMI DAIMA</span>
   </div>
-</nav>
+</div> 
+                  
+                      <h1 id="groupName" class="text-xl font-bold text-[#05bfdb]">MAGERI UCHUMI DAIMA</h1>
+                    <p class="text-xs text-gray-400">Tunaokoleana Kiuchumi</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" id="themeBtn" class="bg-[#0a4d68] px-3 py-2 rounded-lg hover:bg-[#088395] transition">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div id="userStatusNav" class="text-sm"></div>
+                <button id="loginBtnNav" onclick="showLoginModal()" class="bg-[#088395] px-4 py-2 rounded-lg hover:bg-[#05bfdb] hover:text-[#011f26] transition">
+                    <i class="fas fa-sign-in-alt mr-1"></i>Ingia
+                </button>
+            </div>
+        </div>
+    </nav>
 
-<p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
-<!-- HOME PAGE -->
+    <!-- HOME PAGE -->
     <div id="home" class="min-h-screen">
         <div class="max-w-7xl mx-auto p-4 py-8">
             <!-- HERO SECTION -->
@@ -2524,6 +2495,8 @@ checkInstallPrompt();
         });
       });
     }
+
+ 
   </script>
 </body>
 </html>
