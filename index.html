@@ -165,14 +165,9 @@
     <div id="toastContainer"></div>
 
     <!-- NAVIGATION -->
-    <nav class="glass sticky top-0 z-50 p-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img id="groupLogo" src="https://ui-avatars.com/api/?name=MAGERI&background=05bfdb&color=011f26&bold=true" class="w-12 h-12 rounded-full border-2 border-[#05bfdb]">
-                <div>
-                   <header>
-  <nav class="mageri-header">
-    <!-- Hii ni logo kushoto -->
+    <nav class="glass sticky top-0 z-50 p-4 mageri-header">
+        <div class="max-w-7xl mx-auto flex items-center w-full">
+    <!-- Logo kushoto -->
     <div class="mageri-logo">
       <div class="mageri-icon">🍊</div>
       <div class="logo-text">
@@ -180,24 +175,22 @@
         <span class="tagline">UCHUMI DAIMA</span>
       </div>
     </div>
-  </nav>
-</header>
-    <p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
-</div>
-    <nav class="mageri-header">
-            <div class="flex items-center gap-3 nav-actions">
-                <button onclick="toggleTheme()" id="themeBtn" class="bg-[#0a4d68] px-3 py-2 rounded-lg hover:bg-[#088395] transition">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <div id="userStatusNav" class="text-sm"></div>
-                <button id="loginBtnNav" onclick="showLoginModal()" class="bg-[#088395] px-4 py-2 rounded-lg hover:bg-[#05bfdb] hover:text-[#011f26] transition">
-                    <i class="fas fa-sign-in-alt mr-1"></i>Ingia
-                </button>
-            </div>
-        </div>
-    </nav>
 
-    <!-- HOME PAGE -->
+    <!-- Buttons kulia -->
+    <div class="flex items-center gap-3 nav-actions">
+      <button onclick="toggleTheme()" id="themeBtn">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button id="loginBtnNav" onclick="showLoginModal()">
+        <i class="fas fa-sign-in-alt mr-1"></i>Ingia
+      </button>
+    </div>
+    
+  </div>
+</nav>
+
+<p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
+<!-- HOME PAGE -->
     <div id="home" class="min-h-screen">
         <div class="max-w-7xl mx-auto p-4 py-8">
             <!-- HERO SECTION -->
