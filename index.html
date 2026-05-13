@@ -105,12 +105,15 @@
 @media (prefers-color-scheme: dark) {
   .tagline {
     color: #9CA3AF;
+  }  
+    mageri-gradient {    text-shadow: 0 2px 30px rgba(255, 1  }  
+}
+ .nav-actions {
+  margin-left: auto;
+  display: flex;
+   gap: 12px;
   }
-  .mageri-gradient {
-    text-shadow: 0 2px 30px rgba(255, 165, 0, 0.5);
-  }
-}  
-    </style>
+  </style>
 </head>
 <body>
     <!-- TOAST NOTIFICATION -->
@@ -136,7 +139,7 @@
                     <p class="text-xs text-gray-400">Tunaokoleana Kiuchumi</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 nav-actions">
                 <button onclick="toggleTheme()" id="themeBtn" class="bg-[#0a4d68] px-3 py-2 rounded-lg hover:bg-[#088395] transition">
                     <i class="fas fa-moon"></i>
                 </button>
