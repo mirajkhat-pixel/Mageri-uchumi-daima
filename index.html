@@ -113,6 +113,46 @@
   display: flex;
    gap: 12px;
   }
+        .mageri-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+.mageri-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mageri-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.mageri-gradient {
+  background: linear-gradient(90deg, #ff8c00, #ffa500, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.tagline {
+  font-size: 0.8rem;
+  color: #9CA3AF;
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+.nav-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+}
   </style>
 </head>
 <body>
@@ -125,14 +165,24 @@
             <div class="flex items-center gap-3">
                 <img id="groupLogo" src="https://ui-avatars.com/api/?name=MAGERI&background=05bfdb&color=011f26&bold=true" class="w-12 h-12 rounded-full border-2 border-[#05bfdb]">
                 <div>
-                   <!-- LOGO MPYA YA MAGERI -->
-<div class="mageri-logo">
-  <div class="logo-icon">🍊</div>
-  <div class="logo-text">
-    <span class="mageri-gradient">MAGERI</span>
-    <span class="tagline">UCHUMI DAIMA</span>
-  </div>
-</div> 
+                   <header>
+  <nav class="mageri-header">
+    <!-- Hii ni logo kushoto -->
+    <div class="mageri-logo">
+      <div class="mageri-icon">🍊</div>
+      <div class="logo-text">
+        <span class="mageri-gradient">MAGERI</span>
+        <span class="tagline">UCHUMI DAIMA</span>
+      </div>
+    </div>
+
+    <!-- Hizi buttons zitaenda kulia -->
+    <div class="nav-actions">
+      <button id="darkModeBtn">🌙</button>
+      <button id="loginBtn">Ingia</button>
+    </div>
+  </nav>
+</header>
     <p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
 </div>
                     <h1 id="groupName" class="text-xl font-bold text-[#05bfdb]">MAGERI UCHUMI DAIMA</h1>
