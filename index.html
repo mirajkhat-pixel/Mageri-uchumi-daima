@@ -141,12 +141,22 @@
   color: #9CA3AF;
   font-weight: 500;
   margin-left: 2px;
-}
+        }
+                                   }
 
 .nav-actions {
   margin-left: auto;
   display: flex;
   gap: 12px;
+}
+        .nav-actions {
+  margin-left: auto;
+}
+
+.mageri-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
   </style>
 </head>
@@ -174,9 +184,7 @@
 </header>
     <p id="notifStatus" style="font-size: 12px; margin-top: 5px; color: #666;"></p>
 </div>
-                    
-                </div>
-            </div>
+    <nav class="mageri-header">
             <div class="flex items-center gap-3 nav-actions">
                 <button onclick="toggleTheme()" id="themeBtn" class="bg-[#0a4d68] px-3 py-2 rounded-lg hover:bg-[#088395] transition">
                     <i class="fas fa-moon"></i>
