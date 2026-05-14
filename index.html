@@ -1637,45 +1637,44 @@ if (!db.wanachama.find(w => w.simu === '+255765534400')) {
         }
 
         function checkLiveMeetingStatus() {
-            const activeMeeting = db.meetings.find(m => m.active);
-            const container = document.getElementById('liveMeetingStatus');
+  const activeMeeting = db.meetings.find(m => m.active);
+  const container = document.getElementById('liveMeetingStatus');
+  
+  if (!container) return; // Acha hapa kama element haipo, epuka error
 
-            if(activeMeeting) {
-                liveMeetingActive = true;
-                const mtoa = db.wanachama.find(w => w.id === activeMeeting.hostId);
-
-                container.innerHTML = `
-                    <div class="bg-red-900/20 border-2 border-red-500 p-6 rounded-lg">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="w-3 h-3 bg-red-500 rounded-full live-pulse"></span>
-                            <span class="font-bold text-red-500">LIVE SASA</span>
-                        </div>
-                        <h4 class="text-xl font-bold mb-2">${activeMeeting.title}</h4>
-                        <p class="text-sm text-gray-300 mb-3">${activeMeeting.agenda}</p>
-                        <p class="text-xs text-gray-400 mb-4"><i class="fas fa-user mr-1"></i>Mwenyeji: ${mtoa? mtoa.jina : 'Admin'}</p>
-                        <button onclick="joinLiveMeeting(${activeMeeting.id})" class="w-full bg-red-600 py-3 rounded-lg font-semibold">
-                            <i class="fas fa-video mr-2"></i>Jiunge na Mkutano
-                        </button>
-                    </div>
-                `;
-
-                document.getElementById('liveIndicator')?.classList.remove('hidden');
-            } else {
-                liveMeetingActive = false;
-                container.innerHTML = `
-                    <div class="bg-[#011f26] p-6 rounded-lg text-center">
-                        <i class="fas fa-video-slash text-4xl text-gray-600 mb-3"></i>
-                        <p class="text-gray-400">Hakuna mkutano wa moja kwa moja sasa</p>
-                    </div>
-                `;
-                document.getElementById('liveIndicator')?.classList.add('hidden');
-            }
-
-            const liveSection = document.getElementById('liveMeetingContainer');
-            if(liveSection) {
-                liveSection.innerHTML = container.innerHTML;
-            }
-        }
+  if (activeMeeting) {
+    liveMeetingActive = true;
+    const meetingHost = db.wanachama.find(m => m.id === activeMeeting.hostId);
+    
+    container.innerHTML = `
+      <div class="bg-red-50/20 border-2 border-red-500 p-4 rounded-lg">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-red-500 rounded-full live-pulse"></span>
+            <span class="font-bold text-red-600">LIVE SASA</span>
+          </div>
+        </div>
+        <h4 class="text-xl font-bold mt-2">${activeMeeting.title}</h4>
+        <p class="text-sm text-gray-600">Mwalimu: ${meetingHost ? meetingHost.jina : 'Admin'}</p>
+        <button onclick="joinLiveMeeting('${activeMeeting.id}')" class="w-full bg-red-600 py-3 rounded-lg font-semibold mt-3 text-white">
+          <i class="fas fa-video mr-2"></i>Jiunge na Mkutano
+        </button>
+      </div>
+    `;
+    
+    document.getElementById('liveIndicator')?.classList.remove('hidden');
+  } else {
+    liveMeetingActive = false;
+    container.innerHTML = `
+      <div class="bg-[#f8f9f6] p-4 rounded-lg text-center">
+        <i class="fas fa-video-slash text-gray-400 text-3xl"></i>
+        <p class="text-gray-500 mt-2">Hakuna mkutano wa moja kwa moja sasa</p>
+      </div>
+    `;
+    
+    document.getElementById('liveIndicator')?.classList.add('hidden');
+  }
+}
 
         function startLiveMeeting() {
             const title = document.getElementById('meetingTitle').value.trim();
