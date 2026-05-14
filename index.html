@@ -552,13 +552,19 @@ if (!db.wanachama.find(w => w.simu === '+255765534400')) {
             window.open(url, '_blank');
         }
         // PAGE LOADERS
-        function loadGroupProfile() {
-            document.getElementById('groupName').textContent = db.mipangilio.jina;
-            document.getElementById('groupLogo').src = db.mipangilio.groupLogo;
-            document.getElementById('editGroupLogo').src = db.mipangilio.groupLogo;
-            document.getElementById('editGroupName').value = db.mipangilio.jina;
-        }
+    function loadGroupProfile() {
+  const groupName = document.getElementById('groupName');
+  if (groupName) groupName.textContent = db.mipangilio.jina;
 
+  const groupLogo = document.getElementById('groupLogo');
+  if (groupLogo) groupLogo.src = db.mipangilio.groupLogo;
+
+  const editGroupLogo = document.getElementById('editGroupLogo');
+  if (editGroupLogo) editGroupLogo.src = db.mipangilio.groupLogo;
+
+  const editGroupName = document.getElementById('editGroupName');
+  if (editGroupName) editGroupName.value = db.mipangilio.jina;
+}
         function loadHomePage() {
             document.getElementById('totalMembers').textContent = db.wanachama.length;
             document.getElementById('totalMichango').textContent = `TZS ${db.michango.reduce((s, m) => s + m.kiasi, 0).toLocaleString()}`;
