@@ -12,9 +12,9 @@
 
   const firebaseConfig = {
     apiKey: "AIzaSyAx1Tg2V-OSBfUAvw5-LxL-iyyWb5pbcRQ",
-    authDomain: "mageri-uchumi-daima.firebaseapp.com",
-    projectId: "mageri-uchumi-daima",
-    storageBucket: "mageri-uchumi-daima.firebasestorage.app",
+    authDomain: "Mageri-uchumi-daima.firebaseapp.com",
+    projectId: "Mageri-uchumi-daima",
+    storageBucket: "Mageri-uchumi-daima.firebasestorage.app",
     messagingSenderId: "670762770974",
     appId: "1:670762770974:web:32b326c8c6ef0a273f040f"
   };
@@ -26,7 +26,7 @@
   window.firebaseDB = db;
   window.firestoreFuncs = { doc, setDoc, getDoc, onSnapshot, updateDoc };
 </script>
-    <link rel="manifest" href="/mageri-uchumi-daima/manifest.json">
+    <link rel="manifest" href="/Mageri-uchumi-daima/manifest.json">
     <meta name="theme-color" content="#f39c12">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -2495,25 +2495,8 @@ checkInstallPrompt();
             });
         }
     }
-</script>
-  <!-- WEKA HII KABLA YA </body> -->
-  <script>
-    // PWA INSTALL + UPDATE BADGE
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(reg => {
-        reg.addEventListener('updatefound', () => {
-          const newSW = reg.installing;
-          newSW.addEventListener('statechange', () => {
-            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-              if(confirm('MAGERI V3 Ipo! Bonyeza OK ku-update sasa.')) {
-                newSW.postMessage('SKIP_WAITING');
-                window.location.reload();
-              }
-            }
-          });
-        });
-      });
-    }
+
+}
 
  
   </script>
