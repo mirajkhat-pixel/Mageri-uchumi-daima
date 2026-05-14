@@ -2443,7 +2443,7 @@ if (!db.wanachama.find(w => w.simu === '+255765534400')) {
     // Register Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
+            navigator.serviceWorker.register('/Mageri-uchumi-daima/sw.js')
                 .then(reg => console.log('PWA: Service Worker registered'))
                 .catch(err => console.log('PWA: Failed', err));
         });
