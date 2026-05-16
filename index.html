@@ -32,12 +32,19 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <script>
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Mageri-uchumi-daima/sw.js');
+    navigator.serviceWorker.register('/Mageri-uchumi-daima/sw.js', {
+      scope: '/Mageri-uchumi-daima/'
+    }).then(reg => {
+      console.log('SW registered:', reg.scope);
+    }).catch(err => {
+      console.log('SW registration failed:', err);
+    });
   });
-}
-        </script>
+}    
+    </script>
     <!-- zilizopo zingine ziachi... -->
 </head>
 <!-- PWA Meta Tags -->
