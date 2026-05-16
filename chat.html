@@ -1,1 +1,299 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mageri Uchumi Daima - Chat</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --bg2: #1e293b;
+  --text: #f8fafc;
+  --accent: #3b82f6;
+  --accent2: #10b981;
+  --border: #334155;
+}
 
+[data-theme="light"] {
+  --bg: #f8fafc;
+  --bg2: #ffffff;
+  --text: #0f172a;
+  --accent: #2563eb;
+  --accent2: #059669;
+  --border: #e2e8f0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: 0.3s;
+}
+
+header {
+  padding: 16px 24px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card {
+  background: var(--bg2);
+  padding: 40px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.card h2 {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.chat-container {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+}
+
+.chat-box {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.message {
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  background: var(--bg2);
+  border-radius: 12px;
+  max-width: 70%;
+}
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.theme-toggle {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.loading {
+  text-align: center;
+  opacity: 0.6;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Mageri Uchumi Daima</div>
+  <div>
+    <span class="theme-toggle" id="themeBtn">🌙</span>
+    <button class="btn btn-ghost" id="logoutBtn" style="display:none">Toka</button>
+  </div>
+</header>
+
+<div class="container" id="authSection">
+  <div class="card">
+    <h2>Ingia au Jisajili</h2>
+    <input type="email" id="email" placeholder="Email yako">
+    <input type="password" id="password" placeholder="Nywila">
+    <button class="btn" id="loginBtn" style="width:100%; margin-bottom:10px">Ingia</button>
+    <button class="btn btn-ghost" id="signupBtn" style="width:100%">Jisajili</button>
+    <p id="authMsg" style="margin-top:12px; text-align:center; color:#ef4444"></p>
+  </div>
+</div>
+
+<div class="chat-container" id="chatSection">
+  <div class="chat-box" id="chatBox">
+    <div class="loading">Inapakia mazungumzo...</div>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="msgInput" placeholder="Andika ujumbe wako...">
+    <button class="btn" id="sendBtn">Tuma</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAx1Tg2V-OSBfUAvw5-LxL-iyyWb5pbcRQ",
+  authDomain: "mageri-uchumi-daima.firebaseapp.com",
+  databaseURL: "https://mageri-uchumi-daima-default-rtdb.firebaseio.com",
+  projectId: "mageri-uchumi-daima",
+  storageBucket: "mageri-uchumi-daima.firebasestorage.app",
+  messagingSenderId: "670762770974",
+  appId: "1:670762770974:web:32b326c8c6ef0a273f040f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const authSection = document.getElementById('authSection');
+const chatSection = document.getElementById('chatSection');
+const logoutBtn = document.getElementById('logoutBtn');
+const themeBtn = document.getElementById('themeBtn');
+
+// Theme toggle
+let dark = true;
+themeBtn.onclick = () => {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  themeBtn.textContent = dark ? '🌙' : '☀️';
+};
+
+// Auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    authSection.style.display = 'none';
+    chatSection.style.display = 'flex';
+    logoutBtn.style.display = 'inline-block';
+    loadMessages();
+  } else {
+    authSection.style.display = 'flex';
+    chatSection.style.display = 'none';
+    logoutBtn.style.display = 'none';
+  }
+});
+
+// Login
+document.getElementById('loginBtn').onclick = async () => {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    document.getElementById('authMsg').textContent = e.message;
+  }
+};
+
+// Signup
+document.getElementById('signupBtn').onclick = async () => {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    document.getElementById('authMsg').textContent = e.message;
+  }
+};
+
+// Logout
+logoutBtn.onclick = () => signOut(auth);
+
+// Send message
+document.getElementById('sendBtn').onclick = sendMessage;
+document.getElementById('msgInput').onkeypress = (e) => {
+  if (e.key === 'Enter') sendMessage();
+};
+
+function sendMessage() {
+  const msg = document.getElementById('msgInput').value.trim();
+  if (!msg || !auth.currentUser) return;
+  
+  push(ref(db, 'global_chat'), {
+    uid: auth.currentUser.uid,
+    email: auth.currentUser.email,
+    text: msg,
+    time: Date.now()
+  });
+  document.getElementById('msgInput').value = '';
+}
+
+// Load messages
+function loadMessages() {
+  const chatBox = document.getElementById('chatBox');
+  chatBox.innerHTML = '';
+  const q = query(ref(db, 'global_chat'), limitToLast(50));
+  
+  onChildAdded(q, (data) => {
+    const msg = data.val();
+    const div = document.createElement('div');
+    div.className = 'message';
+    div.innerHTML = `<strong>${msg.email.split('@')[0]}:</strong> ${msg.text}`;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+}
+</script>
+
+</body>
+</html>
